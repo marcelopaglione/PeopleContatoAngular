@@ -36,4 +36,9 @@
     message: string;
   }
 
+  export interface PersonContatoEntity {
+    person: Person;
+    contatos: Contato[];
+  }
+
 

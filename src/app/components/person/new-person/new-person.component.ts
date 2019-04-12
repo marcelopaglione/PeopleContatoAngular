@@ -42,13 +42,13 @@ export class NewPersonComponent implements OnInit {
   }
 
   private initializePageData() {
-    this.fg = this.formBuilder.group({
-      id: [null],
-      name: [null, Validators.required],
-      rg: [null, Validators.required],
-      birthDate: ['', Validators.required]
-    });
+    this.initializeForm();
+    this.cleanContatos();
 
+    this.loadContatos();
+  }
+
+  private loadContatos() {
     const id = this.fg.value.id;
     if (id) {
       this.api.getContatoByPersonId(id, this.page)
@@ -61,26 +61,79 @@ export class NewPersonComponent implements OnInit {
     }
   }
 
-  private saveContatos() {
-    console.log('Save contatos: ');
+  private cleanContatos()  {
     this.componentsReferences.map(contato => {
-      console.log(contato.instance.fg.value);
+      console.log('clean contato');
+      console.log(contato);
+      this.remove(contato.instance.index);
     });
   }
 
+  private initializeForm() {
+    this.fg = this.formBuilder.group({
+      id: [null],
+      name: [null, Validators.required],
+      rg: [null, Validators.required],
+      birthDate: ['', Validators.required]
+    });
+  }
+
+  private isContatosInvalid() {
+    console.log('Validating Contatos to Save');
+    let contatIsInvalid = false;
+    this.componentsReferences.map(contato => {
+        if (!contato.instance.fg.value.name) {
+          this.response.message = 'Por favor informe o nome dos contatos';
+          this.response.status = 'warning';
+          contatIsInvalid = true;
+          return;
+        }
+    });
+    return contatIsInvalid;
+  }
+
+  private getContatos() {
+    const contatos = [];
+    this.componentsReferences.map(contato => {
+      const contatoForm: Contato = contato.instance.fg.value;
+      contatoForm.person = this.fg.value;
+      console.log(contato.instance.fg.value);
+      contatos.push(contatoForm);
+    });
+    return contatos;
+  }
+
+  private isBirthDateInvalid() {
+    if (!this.validateDate(this.fg.value.birthDate)) {
+      this.response.message = 'O formato da data de nascimento está incorreto';
+      this.response.status = 'warning';
+      return true;
+    }
+    return false;
+  }
+
+  private formatFormDate() {
+    this.fg.patchValue({birthDate: this.toDate(this.fg.value.birthDate)});
+  }
+
+  public createEntityToPersist() {
+    const saveEntity = {
+      contatos: this.getContatos(),
+      person: this.fg.value
+    };
+    return saveEntity;
+  }
+
   public savePerson() {
-    this.saveContatos();
     if (this.fg.valid) {
-      if (!this.validateDate(this.fg.value.birthDate)) {
-        this.response.message = 'O formato da data de nascimento está incorreto';
-        this.response.status = 'warning';
-        return;
-      }
-      this.fg.patchValue({birthDate: this.toDate(this.fg.value.birthDate)});
-      console.log(this.fg.value);
-      this.api.savePerson(this.fg.value).subscribe(data => {
-        if (data.status === 201) {
-          this.response.message = `${this.fg.value.name} foi inserido com sucesso!`;
+      if (this.isBirthDateInvalid()) { return; }
+      if (this.isContatosInvalid()) { return; }
+      this.formatFormDate();
+      const entityToPersist = this.createEntityToPersist();
+
+      this.api.savePersonAndContato(entityToPersist).subscribe(data => {
+        if (data.status === 200) {
+          this.response.message = `${this.fg.value.name} foi salvo com sucesso!`;
           this.response.status = 'success';
           this.initializePageData();
         }

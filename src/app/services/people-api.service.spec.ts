@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { PeopleApiService } from './people-api.service';
 import { HttpClientModule } from '@angular/common/http';
-import { Page, Person, Contato } from '../Entities';
+import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
 
 describe('PeopleApiService', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -135,6 +135,7 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist a person', (done) => {
+    console.log(new Date());
     const service: PeopleApiService = TestBed.get(PeopleApiService);
     const person: Person = {
       name: 'Beatiful Name',
@@ -174,6 +175,44 @@ describe('PeopleApiService', () => {
       expect(data.status).toBe(201);
       expect(data.body.name).toBe(contato.name);
       expect(data.body.id).toBeGreaterThan(0);
+      done();
+    });
+    expect(service).toBeTruthy();
+  });
+
+  it('should create and persist one person and his 3 contatos', (done) => {
+    const service: PeopleApiService = TestBed.get(PeopleApiService);
+    const relatedPerson: Person = {
+      name: 'Person should create and persist one person and his 3 contatos',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 0
+    };
+    const contato1: Contato = {
+      name: 'Contact 1 should create and persist one person and his 3 contatos',
+      id: 0,
+      person: relatedPerson
+    };
+    const contato2: Contato = {
+      name: 'Contact 2 should create and persist one person and his 3 contatos',
+      id: 0,
+      person: relatedPerson
+    };
+    const contato3: Contato = {
+      name: 'Contatc 3 should create and persist one person and his 3 contatos',
+      id: 0,
+      person: relatedPerson
+    };
+
+    const saveEntity: PersonContatoEntity = {
+      person: relatedPerson,
+      contatos: [contato1, contato2, contato3]
+    };
+
+    service.savePersonAndContato(saveEntity)
+    .subscribe(data => {
+      expect(data.status).toBe(200);
+      console.log(data);
       done();
     });
     expect(service).toBeTruthy();

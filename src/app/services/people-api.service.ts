@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Page, Person, Contato } from '../Entities';
+import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
 
 @Injectable({
   providedIn: 'root'
@@ -54,6 +54,10 @@ export class PeopleApiService {
       return this.http.put<any>(`${this.API}contatos/`, contato, this.getHeader());
     }
     return this.http.post<any>(`${this.API}contatos/`, contato, this.getHeader());
+  }
+
+  public savePersonAndContato(entity: PersonContatoEntity): any {
+    return this.http.post<any>(`${this.API}savePersonAndContatos/`, entity, this.getHeader());
   }
 
   public deletePersonById(id: number): any {
