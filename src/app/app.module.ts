@@ -10,6 +10,7 @@ import { TitleComponent } from './components/title/title.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AlertComponent } from './components/alert/alert.component';
+import { HomeComponent } from './components/home/home.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { AlertComponent } from './components/alert/alert.component';
     MenuComponent,
     NewPersonComponent,
     TitleComponent,
-    AlertComponent
+    AlertComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -27,6 +29,7 @@ import { AlertComponent } from './components/alert/alert.component';
     ReactiveFormsModule,
     HttpClientModule
   ],
+  entryComponents: [NewContatoComponent],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   providers: [],
   bootstrap: [AppComponent]

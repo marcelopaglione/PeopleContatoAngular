@@ -153,6 +153,7 @@ export class NewPersonComponent implements OnInit {
   }
 
   createComponent(contato: Contato) {
+
     const componentFactory = this.CFR.resolveComponentFactory(NewContatoComponent);
     const componentRef: ComponentRef<NewContatoComponent> = this.VCR.createComponent(componentFactory);
     const currentComponent = componentRef.instance;

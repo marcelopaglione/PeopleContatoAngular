@@ -1,0 +1,44 @@
+<app-title title="Gerenciar Pessoas"></app-title>
+
+<a class="btn btn-info mb-3" routerLink="/newPerson">Nova Pessoa</a>
+
+<table class="table" *ngIf="people">
+    <thead>
+      <tr>
+        <th scope="col">id</th>
+        <th scope="col">Nome</th>
+        <th scope="col">RG</th>
+        <th scope="col">Data de Nascimento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of people">
+        <th scope="row">{{item.id}}</th>
+        <td>{{item.name}}</td>
+        <td>{{item.rg}}</td>
+        <td>{{item.birthDate}}</td>
+      </tr>
+    </tbody>
+
+    <nav aria-label="..." class="d-flex">
+      <ul class="pagination justify-content-center pagination-sm">
+        <li class="page-item" [ngClass]="{'disabled': page.first}">
+          <a class="page-link" (click)="firstPage()" tabindex="-1" aria-disabled="true">First</a>
+        </li>
+        <li class="page-item" [ngClass]="{'disabled': page.first}">
+          <a class="page-link" (click)="prevPage()" tabindex="-1" aria-disabled="true"><span aria-hidden="true">&laquo;</span></a>
+        </li>
+
+        <li *ngFor="let item of inBetweenPages" class="page-item" [ngClass]="{'active': (item - 1) === page.number}">
+          <a class="page-link" (click)="gotoPage(item-1)">{{item}}</a>
+        </li>
+
+        <li class="page-item" [ngClass]="{'disabled': page.last}">
+          <a class="page-link" (click)="nextPage()"><span aria-hidden="true">&raquo;</span></a>
+        </li>
+        <li class="page-item" [ngClass]="{'disabled': page.last}">
+          <a class="page-link" (click)="lastPage()">Last</a>
+        </li>
+      </ul>
+    </nav>
+  </table>
