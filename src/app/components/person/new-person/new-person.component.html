@@ -1,0 +1,43 @@
+<app-title title="Cadastrar Nova Pessoa"></app-title>
+
+<div class="row">
+  <div class="container col-md-12">
+    <form [formGroup]="fg">
+
+      <div class="form-group">
+        <label for="name">Nome</label>
+        <input type="text" class="form-control" id="name" formControlName="name" placeholder="Insira o nome completo">
+      </div>
+
+      <div class="form-group">
+        <label for="rg">RG</label>
+        <input type="text" class="form-control" id="rg" formControlName="rg" placeholder="Ex: 498362371">
+      </div>
+
+      <div class="form-group">
+        <label for="birthDate">Data de Nascimento</label>
+        <input type="text" class="form-control" id="birthDate"
+              formControlName="birthDate" placeholder="dd/mm/yyyy">
+      </div>
+
+      <div class="form-group">
+        <div>
+          <ng-template #viewContainerRef></ng-template>
+        </div>
+        <div class="row mt-3">
+          <button type="button" class="btn btn-info mr-2" (click)="createEmptyComponenet()"> Add Contato </button>
+          <button class="btn btn-info" (click)="savePerson()">Salvar</button>
+        </div>
+      </div>
+
+
+
+    </form>
+
+  </div>
+</div>
+
+
+
+
+<app-alert [reponseMessage]="response"></app-alert>
