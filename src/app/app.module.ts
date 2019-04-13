@@ -10,7 +10,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AlertComponent } from './components/alert/alert.component';
 import { HomeComponent } from './components/home/home.component';
 import { NewContatoComponent } from './components/contato/new-contato.component';
-import { ManagerPersonComponent } from './components/person/manage-person.component';
+import { ManagerPersonComponent } from './components/person/manage/manage-person.component';
+import { ViewPersonComponent } from './components/person/view/view-person.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ManagerPersonComponent } from './components/person/manage-person.compon
     ManagerPersonComponent,
     TitleComponent,
     AlertComponent,
-    HomeComponent
+    HomeComponent,
+    ViewPersonComponent,
   ],
   imports: [
     BrowserModule,

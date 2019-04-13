@@ -1,13 +1,6 @@
 
-  export interface PageContent {
-      id: number;
-      name: string;
-      rg: string;
-      birthDate: Date;
-  }
-
   export interface Page {
-      content: PageContent[];
+      content: Person[];
       first: boolean;
       last: boolean;
       totalElements: number;

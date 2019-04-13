@@ -3,83 +3,280 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
 import { isUndefined, isNull } from 'util';
+import {
+  HttpInterceptor,
+  HttpHandler,
+  HttpRequest,
+  HttpResponse,
+  HttpErrorResponse
+} from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { retry, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PeopleApiService {
-
-  constructor(
-    private http: HttpClient
-  ) { }
+  constructor(private http: HttpClient) {}
 
   private readonly API = environment.API;
 
-  public getPeople(page: Page): any {
-    return this.http.get<any>(`${this.API}people?size=${page.size}&page=${page.number}`, this.getHeader());
+  public getPeople(page: Page): Observable<HttpResponse<Page>> {
+    return this.http
+      .get<Page>(`${this.API}people?size=${page.size}&page=${page.number}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public getContatos(page: Page): any {
-    return this.http.get<any>(`${this.API}contatos?size=${page.size}&page=${page.number}`, this.getHeader());
+  public getContatos(page: Page): Observable<HttpResponse<Contato[]>> {
+    return this.http
+      .get<Contato[]>(
+        `${this.API}contatos?size=${page.size}&page=${page.number}`,
+        {
+          headers: this.getHeaders(),
+          observe: 'response'
+        }
+      )
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public getPersonById(id: number): any {
-    return this.http.get<any>(`${this.API}people/${id}`, this.getHeader());
+  public getPersonById(id: number): Observable<HttpResponse<Person>> {
+    return this.http
+      .get<Person>(`${this.API}people/${id}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public getContatoById(id: number): any {
-    return this.http.get<any>(`${this.API}contatos/${id}`, this.getHeader());
+  public getContatoById(id: number): Observable<HttpResponse<Contato>> {
+    return this.http
+      .get<Contato>(`${this.API}contatos/${id}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public getPersonByNameContaining(name: string, page: Page): any {
-    return this.http.get<any>(`${this.API}people/findByName/${name}?size=${page.size}&page=${page.number}`, this.getHeader());
+  public getPersonByNameContaining(name: string, page: Page): Observable<HttpResponse<Page>> {
+    return this.http
+      .get<Page>(
+        `${this.API}people/findByName/${name}?size=${page.size}&page=${
+          page.number
+        }`,
+        {
+          headers: this.getHeaders(),
+          observe: 'response'
+        }
+      )
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
   public getContatoByNameContaining(name: string): any {
-    return this.http.get<any>(`${this.API}contatos/findByName/${name}`, this.getHeader());
+    return this.http
+      .get<any>(`${this.API}contatos/findByName/${name}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public getContatoByPersonId(id: number, page: Page): any {
-    return this.http.get<any>(`${this.API}contatos/findByPersonId/${id}?size=${page.size}&page=${page.number}`, this.getHeader());
+  public getContatoByPersonId(id: number, page: Page): Observable<HttpResponse<Contato[]>> {
+    return this.http
+      .get<Contato[]>(
+        `${this.API}contatos/findByPersonId/${id}?size=${page.size}&page=${
+          page.number
+        }`,
+        {
+          headers: this.getHeaders(),
+          observe: 'response'
+        }
+      )
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public savePerson(person: Person): any {
+  public savePerson(person: Person): Observable<HttpResponse<any>> {
     if (person.id && person.id !== 0) {
-      return this.http.put<any>(`${this.API}people/`, person, this.getHeader());
+      return this.http
+        .put<any>(`${this.API}people/`, person, {
+          headers: this.getHeaders(),
+          observe: 'response'
+        })
+        .pipe(
+          retry(1),
+          catchError((error: HttpErrorResponse) => {
+            const errorMessage = this.handleErrors(error);
+            return throwError(errorMessage);
+          })
+        );
     }
-    return this.http.post<any>(`${this.API}people/`, person, this.getHeader());
+    return this.http
+      .post<any>(`${this.API}people/`, person, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public saveContato(contato: Contato): any {
+  public saveContato(contato: Contato): Observable<HttpResponse<any>> {
     if (contato.id && contato.id !== 0) {
-      return this.http.put<any>(`${this.API}contatos/`, contato, this.getHeader());
+      return this.http
+        .put<any>(`${this.API}contatos/`, contato, {
+          headers: this.getHeaders(),
+          observe: 'response'
+        })
+        .pipe(
+          retry(1),
+          catchError((error: HttpErrorResponse) => {
+            const errorMessage = this.handleErrors(error);
+            return throwError(errorMessage);
+          })
+        );
     }
-    return this.http.post<any>(`${this.API}contatos/`, contato, this.getHeader());
+    return this.http
+      .post<any>(`${this.API}contatos/`, contato, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public savePersonAndContato(entity: PersonContatoEntity): any {
-    if (entity.person.id === 0 || isUndefined(entity.person.id) || isNull(entity.person.id)) {
-      return this.http.post<any>(`${this.API}contatos/savePersonAndContatos/`, entity, this.getHeader());
+  public savePersonAndContato(entity: PersonContatoEntity): Observable<HttpResponse<any>> {
+    if (
+      entity.person.id === 0 ||
+      isUndefined(entity.person.id) ||
+      isNull(entity.person.id)
+    ) {
+      return this.http
+        .post<any>(`${this.API}contatos/savePersonAndContatos/`, entity, {
+          headers: this.getHeaders(),
+          observe: 'response'
+        })
+        .pipe(
+          retry(1),
+          catchError((error: HttpErrorResponse) => {
+            const errorMessage = this.handleErrors(error);
+            return throwError(errorMessage);
+          })
+        );
     } else {
-      return this.http.put<any>(`${this.API}contatos/updatePersonAndContatos/`, entity, this.getHeader());
+      return this.http
+        .put<any>(`${this.API}contatos/updatePersonAndContatos/`, entity, {
+          headers: this.getHeaders(),
+          observe: 'response'
+        })
+        .pipe(
+          retry(1),
+          catchError((error: HttpErrorResponse) => {
+            const errorMessage = this.handleErrors(error);
+            return throwError(errorMessage);
+          })
+        );
     }
   }
 
-  public deletePersonById(id: number): any {
-    return this.http.delete<any>(`${this.API}people/${id}`, this.getHeader());
+  public deletePersonById(id: number): Observable<HttpResponse<any>> {
+    return this.http
+      .delete<any>(`${this.API}people/${id}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  public deleteContatoById(id: number): any {
-    return this.http.delete<any>(`${this.API}contatos/${id}`, this.getHeader());
+  public deleteContatoById(id: number): Observable<HttpResponse<any>> {
+    return this.http
+      .delete<any>(`${this.API}contatos/${id}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+      .pipe(
+        retry(1),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage = this.handleErrors(error);
+          return throwError(errorMessage);
+        })
+      );
   }
 
-  private getHeader() {
-    const httpOptions: { headers; observe; } = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json'
-      }),
-      observe: 'response'
-    };
-    return httpOptions;
+  private handleErrors(error: HttpErrorResponse) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      // client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    window.alert(errorMessage);
+    return errorMessage;
+  }
+
+  private getHeaders(): HttpHeaders | { [header: string]: string | string[] } {
+    return new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json');
   }
 }

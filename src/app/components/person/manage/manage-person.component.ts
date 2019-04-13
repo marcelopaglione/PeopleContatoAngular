@@ -2,9 +2,9 @@ import { Component, OnInit, ComponentRef, ViewChild, ViewContainerRef, Component
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { ReponseMessage, Contato, Page } from 'src/app/Entities';
-import { NewContatoComponent } from '../contato/new-contato.component';
 import { Router, ActivatedRoute  } from '@angular/router';
 import { isNull } from 'util';
+import { NewContatoComponent } from '../../contato/new-contato.component';
 
 @Component({
   selector: 'app-manage-person',
@@ -68,8 +68,10 @@ export class ManagerPersonComponent implements OnInit {
     if (this.idFromUrlParam) {
       this.api.getPersonById(this.idFromUrlParam)
       .subscribe(person => {
+        console.log('loading person data :');
+        console.log(person);
         this.fg.patchValue(person.body);
-        this.fg.patchValue({birthDate: this.formatDate(person.body.birthDate)});
+        this.fg.patchValue({birthDate: this.formatDate(person.body.birthDate.toString())});
         this.setApplicationTitle();
       });
 
