@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Person, Page } from 'src/app/Entities';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -10,11 +11,13 @@ import { Person, Page } from 'src/app/Entities';
 export class HomeComponent implements OnInit {
 
   constructor(
-    private api: PeopleApiService
+    private api: PeopleApiService,
+    private router: Router
   ) { }
 
   people: Person[];
   inBetweenPages: number[] = [];
+  searchString = '';
   page: Page = {
     content: [],
     first: true,
@@ -33,24 +36,38 @@ export class HomeComponent implements OnInit {
 
   private loadPeoplePaginatedFromDatabase() {
     this.api.getPeople(this.page).subscribe(paginatedPeople => {
-      this.people = paginatedPeople.body.content;
-      this.page.first = paginatedPeople.body.first;
-      this.page.last = paginatedPeople.body.last;
-      this.page.totalElements = paginatedPeople.body.totalElements;
-      this.page.totalPages = paginatedPeople.body.totalPages;
-      this.page.number = paginatedPeople.body.number;
-      this.page.size = paginatedPeople.body.size;
-      this.page.numberOfElements = paginatedPeople.body.numberOfElements;
-      this.page.empty = paginatedPeople.body.empty;
-      console.log(this.page);
+      this.setPaginatedDataIntoPeople(paginatedPeople);
       this.configureInBetweenPages();
     });
   }
 
+  private resetPagination() {
+    this.page = {
+      content: [],
+      first: true,
+      last: false,
+      totalElements: 0,
+      totalPages: 0,
+      number: 0,
+      size: 10,
+      numberOfElements: 0,
+      empty: true
+    };
+  }
+
+  private setPaginatedDataIntoPeople(paginatedPeople: any) {
+    this.people = paginatedPeople.body.content;
+    this.page.first = paginatedPeople.body.first;
+    this.page.last = paginatedPeople.body.last;
+    this.page.totalElements = paginatedPeople.body.totalElements;
+    this.page.totalPages = paginatedPeople.body.totalPages;
+    this.page.number = paginatedPeople.body.number;
+    this.page.size = paginatedPeople.body.size;
+    this.page.numberOfElements = paginatedPeople.body.numberOfElements;
+    this.page.empty = paginatedPeople.body.empty;
+  }
 
   private configureInBetweenPages() {
-    console.log('inbet');
-    console.log(this.inBetweenPages);
     const curretPage = this.page.number + 1;
     const totalPages = this.page.totalPages;
     this.inBetweenPages = [];
@@ -68,27 +85,82 @@ export class HomeComponent implements OnInit {
 
   public nextPage() {
     this.page.number = this.page.number + 1;
-    this.loadPeoplePaginatedFromDatabase();
+    this.updateListViewAtPage();
   }
 
   public prevPage() {
     this.page.number = this.page.number - 1;
-    this.loadPeoplePaginatedFromDatabase();
+    this.updateListViewAtPage();
   }
 
   public firstPage() {
     this.page.number = 0;
-    this.loadPeoplePaginatedFromDatabase();
+    this.updateListViewAtPage();
   }
 
   public lastPage() {
     this.page.number = this.page.totalPages - 1;
-    this.loadPeoplePaginatedFromDatabase();
+    this.updateListViewAtPage();
   }
 
   public gotoPage(pageNumber: number) {
+    console.log('goto to page '+ pageNumber);
     this.page.number = pageNumber;
-    this.loadPeoplePaginatedFromDatabase();
+    this.updateListViewAtPage();
+  }
+
+  public editarPerson(personId: number) {
+    this.router.navigate([`person/${personId}`]);
+  }
+
+  private updateListViewAtPage() {
+    if (this.searchString !== '') {
+      this.search();
+    } else {
+      this.loadPeoplePaginatedFromDatabase();
+    }
+  }
+
+  public removerPerson(person: Person) {
+    if (!confirm(`Você ter certeza que deseja remover ${person.name}`)) {
+      return;
+    }
+    this.api.deletePersonById(person.id).subscribe(data => {
+      if (data.status === 200) {
+        this.loadPeoplePaginatedFromDatabase();
+      } else {
+        console.log(`Houve um erro ao deletar person ${person}`);
+      }
+    });
+  }
+
+  public keyDownFunction(event) {
+    if (event.keyCode === 13) {
+      this.searchFromInputUser();
+    }
+  }
+
+  public searchFromInputUser() {
+    this.resetPageToZero();
+    this.search();
+  }
+
+  private resetPageToZero() {
+    this.page.number = 0;
+  }
+
+  private search() {
+    if (this.searchString === '') {
+      this.loadPeoplePaginatedFromDatabase();
+      return;
+    }
+
+    this.api.getPersonByNameContaining(this.searchString, this.page)
+
+    .subscribe(paginatedPeople => {
+      this.setPaginatedDataIntoPeople(paginatedPeople);
+      this.configureInBetweenPages();
+    });
   }
 
 }

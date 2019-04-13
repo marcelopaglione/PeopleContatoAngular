@@ -30,8 +30,8 @@ export class PeopleApiService {
     return this.http.get<any>(`${this.API}contatos/${id}`, this.getHeader());
   }
 
-  public getPersonByNameContaining(name: string): any {
-    return this.http.get<any>(`${this.API}people/findByName/${name}`, this.getHeader());
+  public getPersonByNameContaining(name: string, page: Page): any {
+    return this.http.get<any>(`${this.API}people/findByName/${name}?size=${page.size}&page=${page.number}`, this.getHeader());
   }
 
   public getContatoByNameContaining(name: string): any {

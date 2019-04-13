@@ -1,6 +1,26 @@
 <app-title title="Gerenciar Pessoas"></app-title>
+<div class="row">
+    <div class="col-md-9">
+        <a class="btn btn-info mb-3" routerLink="/person">Nova Pessoa</a>
+    </div>
+    <div class="col-md-3">
+      <div class="input-group">
+        <div class="input-group-prepend" (click)="searchFromInputUser()">
+          <span class="input-group-text" id="basic-addon1">
+            <a>
+              <i style="color: black" class="fas fa-search"></i>
+            </a>
+          </span>
+        </div>
+        <form (keydown)="keyDownFunction($event)">
+          <input type="text" [(ngModel)]="searchString" class="form-control" placeholder="Pesquisar por pessoas" name="Pesquisar">
+        </form>
+      </div>
+    </div>
 
-<a class="btn btn-info mb-3" routerLink="/newPerson">Nova Pessoa</a>
+</div>
+
+
 
 <table class="table" *ngIf="people">
     <thead>
@@ -9,6 +29,7 @@
         <th scope="col">Nome</th>
         <th scope="col">RG</th>
         <th scope="col">Data de Nascimento</th>
+        <th scope="col"><i class="fas fa-cog"></i></th>
       </tr>
     </thead>
     <tbody>
@@ -16,7 +37,12 @@
         <th scope="row">{{item.id}}</th>
         <td>{{item.name}}</td>
         <td>{{item.rg}}</td>
-        <td>{{item.birthDate}}</td>
+        <td>{{item.birthDate | date: 'dd/MM/yyyy' }}</td>
+        <td>
+            <a class="btn btn-small btn-info mr-2" (click)="editarPerson(item.id)" title="Editar {{item.name}}"><i class="fas fa-pencil-alt"></i></a>
+            <a class="btn btn-small btn-info" (click)="removerPerson(item)" title="Remover {{item.name}}"><i class="fas fa-trash"></i></a>
+
+        </td>
       </tr>
     </tbody>
 

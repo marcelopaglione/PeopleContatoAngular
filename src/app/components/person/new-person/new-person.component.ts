@@ -3,6 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { ReponseMessage, Contato, Page } from 'src/app/Entities';
 import { NewContatoComponent } from '../../contato/new-contato/new-contato.component';
+import { Router, ActivatedRoute  } from '@angular/router';
+import { isNull } from 'util';
 
 @Component({
   selector: 'app-new-person',
@@ -16,9 +18,11 @@ export class NewPersonComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private api: PeopleApiService,
-    private CFR: ComponentFactoryResolver
-  ) { }
+    private CFR: ComponentFactoryResolver,
+    private route: ActivatedRoute
+  ) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; }); }
 
+  idFromUrlParam = 0;
   fg: FormGroup;
   response: ReponseMessage = {message: '', status: ''};
   contatos: Contato[] = [];
@@ -45,15 +49,25 @@ export class NewPersonComponent implements OnInit {
     this.initializeForm();
     this.cleanContatos();
 
-    this.loadContatos();
+    this.loadPerson();
+  }
+
+  private loadPerson() {
+    if (this.idFromUrlParam) {
+      this.api.getPersonById(this.idFromUrlParam)
+      .subscribe(person => {
+        this.fg.patchValue(person.body);
+        this.fg.patchValue({birthDate: this.formatDate(person.body.birthDate)});
+      });
+
+      this.loadContatos();
+    }
   }
 
   private loadContatos() {
-    const id = this.fg.value.id;
-    if (id) {
-      this.api.getContatoByPersonId(id, this.page)
+    if (this.idFromUrlParam) {
+      this.api.getContatoByPersonId(this.idFromUrlParam, this.page)
       .subscribe(paginatedContatos => {
-        console.log('contatos ' + JSON.stringify(paginatedContatos.body));
         paginatedContatos.body.map(contato => {
           this.createComponent(contato);
         });
@@ -63,9 +77,9 @@ export class NewPersonComponent implements OnInit {
 
   private cleanContatos()  {
     this.componentsReferences.map(contato => {
-      console.log('clean contato');
-      console.log(contato);
-      this.remove(contato.instance.index);
+      this.cleanComponents(contato.instance.index);
+      this.idFromUrlParam = null;
+
     });
   }
 
@@ -79,7 +93,6 @@ export class NewPersonComponent implements OnInit {
   }
 
   private isContatosInvalid() {
-    console.log('Validating Contatos to Save');
     let contatIsInvalid = false;
     this.componentsReferences.map(contato => {
         if (!contato.instance.fg.value.name) {
@@ -97,7 +110,6 @@ export class NewPersonComponent implements OnInit {
     this.componentsReferences.map(contato => {
       const contatoForm: Contato = contato.instance.fg.value;
       contatoForm.person = this.fg.value;
-      console.log(contato.instance.fg.value);
       contatos.push(contatoForm);
     });
     return contatos;
@@ -112,8 +124,16 @@ export class NewPersonComponent implements OnInit {
     return false;
   }
 
-  private formatFormDate() {
+  private formatDateFromUserInput() {
     this.fg.patchValue({birthDate: this.toDate(this.fg.value.birthDate)});
+  }
+
+  private formatDate(dateToFormt: string) {
+    const dateArray = dateToFormt.substr(0, 10).split('-');
+    const day = dateArray[2];
+    const month = dateArray[1];
+    const year = dateArray[0];
+    return day + '/' + month + '/' + year;
   }
 
   public createEntityToPersist() {
@@ -128,7 +148,7 @@ export class NewPersonComponent implements OnInit {
     if (this.fg.valid) {
       if (this.isBirthDateInvalid()) { return; }
       if (this.isContatosInvalid()) { return; }
-      this.formatFormDate();
+      this.formatDateFromUserInput();
       const entityToPersist = this.createEntityToPersist();
 
       this.api.savePersonAndContato(entityToPersist).subscribe(data => {
@@ -153,7 +173,6 @@ export class NewPersonComponent implements OnInit {
   }
 
   createComponent(contato: Contato) {
-
     const componentFactory = this.CFR.resolveComponentFactory(NewContatoComponent);
     const componentRef: ComponentRef<NewContatoComponent> = this.VCR.createComponent(componentFactory);
     const currentComponent = componentRef.instance;
@@ -161,11 +180,10 @@ export class NewPersonComponent implements OnInit {
     currentComponent.index = ++this.index;
     currentComponent.compInteraction = this;
     componentRef.instance.fg = this.formBuilder.group({
-      id: [null],
+      id: [contato ? contato.id : null],
       name: [contato ? contato.name : null, Validators.required],
-      person: [null]
+      person: [contato ? contato.person : null]
     });
-    console.log(componentRef.instance);
     this.componentsReferences.push(componentRef);
   }
 
@@ -173,13 +191,41 @@ export class NewPersonComponent implements OnInit {
     this.createComponent(null);
   }
 
+  private cleanComponents(index: number) {
+    const componentRef = this.componentsReferences.filter(x => x.instance.index === index)[0];
+    this.removeVisualComponent(componentRef, index);
+
+  }
+
   remove(index: number) {
     if (this.VCR.length < 1) {
       return;
     }
     const componentRef = this.componentsReferences.filter(x => x.instance.index === index)[0];
+
+    if (isNull(componentRef.instance.fg.value.id)) {
+      this.removeVisualComponent(componentRef, index);
+      return;
+    }
+
+    if (!confirm(`Você ter certeza que deseja remover ${componentRef.instance.fg.value.name}`)) {
+      return;
+    }
+
+    this.api.deleteContatoById(componentRef.instance.fg.value.id).subscribe(data => {
+      if (data.status === 200) {
+        this.removeVisualComponent(componentRef, index);
+        this.response.message = `Contato Removido com sucesso`;
+        this.response.status = 'success';
+      } else {
+        this.response.message = `Não foi possível remover contato, Por favor tente novamente mais tarde`;
+        this.response.status = 'warning';
+      }
+    });
+  }
+
+  private removeVisualComponent(componentRef: any, index: number) {
     const vcrIndex: number = this.VCR.indexOf(componentRef);
-    // removing component from container
     this.VCR.remove(vcrIndex);
     this.componentsReferences = this.componentsReferences.filter(x => x.instance.index !== index);
   }
@@ -191,8 +237,6 @@ export class NewPersonComponent implements OnInit {
 
   private validateDate(date: string): boolean {
     const isValidDate = this.toDate(date);
-    console.log(`validate date ${isValidDate}`);
-
     if (!isValidDate.getDate()) {
       return false;
     }
