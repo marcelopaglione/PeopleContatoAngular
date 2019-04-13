@@ -57,7 +57,7 @@ export class PeopleApiService {
   }
 
   public savePersonAndContato(entity: PersonContatoEntity): any {
-    return this.http.post<any>(`${this.API}savePersonAndContatos/`, entity, this.getHeader());
+    return this.http.post<any>(`${this.API}contatos/savePersonAndContatos/`, entity, this.getHeader());
   }
 
   public deletePersonById(id: number): any {
