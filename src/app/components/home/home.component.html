@@ -1,9 +1,9 @@
 <app-title title="Gerenciar Pessoas"></app-title>
-<div class="row">
-    <div class="col-md-9">
+<div class="d-flex justify-content-between">
+    <div >
         <a class="btn btn-info mb-3" routerLink="/person">Nova Pessoa</a>
     </div>
-    <div class="col-md-3">
+    <div >
       <div class="input-group">
         <div class="input-group-prepend" (click)="searchFromInputUser()">
           <span class="input-group-text" id="basic-addon1">
@@ -21,50 +21,85 @@
 </div>
 
 
+<div class="table-responsive">
+    <table class="table table-striped" *ngIf="people">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Nome</th>
+            <th scope="col">RG</th>
+            <th scope="col">Data de Nascimento</th>
+            <th scope="col" class="actions"><i class="fas fa-cog"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <td *ngIf="people.length === 0" class="emptyList">
+            Lista vazia
+          </td>
+          <tr *ngFor="let item of people">
+            <th scope="row">{{item.id}}</th>
+            <td>{{item.name}}</td>
+            <td>{{item.rg}}</td>
+            <td>{{item.birthDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="actionsOptions">
+                <a class="btn btn-sm btn-info mr-2" (click)="editarPerson(item.id)" title="Editar {{item.name}}"><i class="fas fa-pencil-alt"></i></a>
+                <a class="btn btn-sm btn-danger" (click)="removerPerson(item)" title="Remover {{item.name}}"><i class="fas fa-trash"></i></a>
 
-<table class="table" *ngIf="people">
-    <thead>
-      <tr>
-        <th scope="col">id</th>
-        <th scope="col">Nome</th>
-        <th scope="col">RG</th>
-        <th scope="col">Data de Nascimento</th>
-        <th scope="col"><i class="fas fa-cog"></i></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of people">
-        <th scope="row">{{item.id}}</th>
-        <td>{{item.name}}</td>
-        <td>{{item.rg}}</td>
-        <td>{{item.birthDate | date: 'dd/MM/yyyy' }}</td>
-        <td>
-            <a class="btn btn-small btn-info mr-2" (click)="editarPerson(item.id)" title="Editar {{item.name}}"><i class="fas fa-pencil-alt"></i></a>
-            <a class="btn btn-small btn-info" (click)="removerPerson(item)" title="Remover {{item.name}}"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
 
-        </td>
-      </tr>
-    </tbody>
+        </tfoot>
+      </table>
+</div>
 
-    <nav aria-label="..." class="d-flex">
-      <ul class="pagination justify-content-center pagination-sm">
-        <li class="page-item" [ngClass]="{'disabled': page.first}">
-          <a class="page-link" (click)="firstPage()" tabindex="-1" aria-disabled="true">First</a>
-        </li>
-        <li class="page-item" [ngClass]="{'disabled': page.first}">
-          <a class="page-link" (click)="prevPage()" tabindex="-1" aria-disabled="true"><span aria-hidden="true">&laquo;</span></a>
-        </li>
 
-        <li *ngFor="let item of inBetweenPages" class="page-item" [ngClass]="{'active': (item - 1) === page.number}">
-          <a class="page-link" (click)="gotoPage(item-1)">{{item}}</a>
-        </li>
+  <div class="myPagination d-flex justify-content-between">
+      <div>
+          <nav aria-label="..." class="d-flex">
+            <ul class="pagination justify-content-center pagination-sm">
+              <li class="page-item" [ngClass]="{'disabled': page.first}">
+                <a class="page-link" (click)="firstPage()" tabindex="-1" aria-disabled="true">First</a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': page.first}">
+                <a class="page-link" (click)="prevPage()" tabindex="-1" aria-disabled="true"><span aria-hidden="true">&laquo;</span></a>
+              </li>
 
-        <li class="page-item" [ngClass]="{'disabled': page.last}">
-          <a class="page-link" (click)="nextPage()"><span aria-hidden="true">&raquo;</span></a>
-        </li>
-        <li class="page-item" [ngClass]="{'disabled': page.last}">
-          <a class="page-link" (click)="lastPage()">Last</a>
-        </li>
-      </ul>
-    </nav>
-  </table>
+              <li *ngFor="let item of inBetweenPages" class="page-item" [ngClass]="{'active': (item - 1) === page.number}">
+                <a class="page-link" (click)="gotoPage(item-1)">{{item}}</a>
+              </li>
+
+              <li class="page-item" [ngClass]="{'disabled': page.last}">
+                <a class="page-link" (click)="nextPage()"><span aria-hidden="true">&raquo;</span></a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': page.last}">
+                <a class="page-link" (click)="lastPage()">Last</a>
+              </li>
+
+              <li class="page-item">
+                  <div class="dropdown">
+                      <a class="btn btn-sm dropdown-toggle btn-outline-secondary"
+                        role="button" id="dropdownOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{page.size}}
+                      </a>
+
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" (click)="changeMaxItemsPerPage(5)">5</a>
+                        <a class="dropdown-item" (click)="changeMaxItemsPerPage(10)">10</a>
+                        <a class="dropdown-item" (click)="changeMaxItemsPerPage(20)">20</a>
+                        <a class="dropdown-item" (click)="changeMaxItemsPerPage(50)">50</a>
+                      </div>
+                    </div>
+              </li>
+            </ul>
+          </nav>
+
+      </div>
+
+      <div>
+          <div class="totalItemsPesquisados">
+            Total de itens mostrados: {{page.totalElements}}
+          </div>
+      </div>
+    </div>

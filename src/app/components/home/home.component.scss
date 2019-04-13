@@ -2,8 +2,45 @@ a, .input-group-prepend {
   cursor: pointer;
 }
 
-
-
-i {
+td i {
   color: white
+}
+
+.totalItemsPesquisados {
+  font-family: 'Montserrat';
+}
+
+.emptyList {
+  display: flex;
+  font-family: 'Montserrat';
+  line-height: 40px;
+
+}
+
+.actions {
+  color: black;
+  text-align: right
+}
+
+.actionsOptions {
+  text-align: right;
+}
+
+.btn-outline-secondary {
+  border-color: #dee2e6;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.btn-outline-secondary:hover {
+  text-decoration: none;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}
+
+
+.btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show>.btn-outline-secondary.dropdown-toggle {
+  color: black;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
 }

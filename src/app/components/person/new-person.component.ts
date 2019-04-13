@@ -2,9 +2,9 @@ import { Component, OnInit, ComponentRef, ViewChild, ViewContainerRef, Component
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { ReponseMessage, Contato, Page } from 'src/app/Entities';
-import { NewContatoComponent } from '../../contato/new-contato/new-contato.component';
+import { NewContatoComponent } from '../contato/new-contato.component';
 import { Router, ActivatedRoute  } from '@angular/router';
-import { isNull } from 'util';
+import { isNull, isUndefined } from 'util';
 
 @Component({
   selector: 'app-new-person',
@@ -19,9 +19,11 @@ export class NewPersonComponent implements OnInit {
     private formBuilder: FormBuilder,
     private api: PeopleApiService,
     private CFR: ComponentFactoryResolver,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; }); }
 
+  title = '';
   idFromUrlParam = 0;
   fg: FormGroup;
   response: ReponseMessage = {message: '', status: ''};
@@ -43,6 +45,16 @@ export class NewPersonComponent implements OnInit {
 
   ngOnInit() {
     this.initializePageData();
+    this.setApplicationTitle();
+  }
+
+  private setApplicationTitle() {
+    console.log(this.fg.value);
+    if (isNull(this.fg.value.id)) {
+      this.title = 'Cadastrar Nova Pessoa';
+    } else {
+      this.title = 'Editar Pessoa';
+    }
   }
 
   private initializePageData() {
@@ -58,6 +70,7 @@ export class NewPersonComponent implements OnInit {
       .subscribe(person => {
         this.fg.patchValue(person.body);
         this.fg.patchValue({birthDate: this.formatDate(person.body.birthDate)});
+        this.setApplicationTitle();
       });
 
       this.loadContatos();
@@ -241,6 +254,10 @@ export class NewPersonComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  public navigateBack() {
+    this.router.navigate(['home']);
   }
 
 }

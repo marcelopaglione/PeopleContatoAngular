@@ -163,4 +163,9 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  public changeMaxItemsPerPage(maxItemsPerPage: number) {
+    this.page.size = maxItemsPerPage;
+    this.searchFromInputUser();
+  }
+
 }

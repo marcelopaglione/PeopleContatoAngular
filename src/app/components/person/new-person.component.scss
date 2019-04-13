@@ -1,0 +1,10 @@
+.addNewContato {
+  flex: 1;
+	margin: 5px;
+	padding: 0 5px;
+	text-align: left;
+  font-size: 1.5em;
+  .btn {
+    align-items: flex-end;
+  }
+}

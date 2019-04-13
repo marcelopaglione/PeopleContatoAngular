@@ -1,4 +1,4 @@
-<app-title title="Cadastrar Nova Pessoa"></app-title>
+<app-title [title]="title"></app-title>
 
 <div class="row">
   <div class="container col-md-12">
@@ -20,17 +20,27 @@
               formControlName="birthDate" placeholder="dd/mm/yyyy">
       </div>
 
-      <div class="form-group">
+      <div class="">
+        <div class="d-flex">
+            <div class="">
+              <h1>Contatos</h1>
+            </div>
+            <div class="addNewContato">
+                <button type="button" class="btn btn-info mr-2" (click)="createEmptyComponenet()" title="Adicionar Novo Contato"> <i class="fas fa-plus-circle"></i> </button>
+            </div>
+        </div>
+
+
         <div>
           <ng-template #viewContainerRef></ng-template>
         </div>
-        <div class="row mt-3">
-          <button type="button" class="btn btn-info mr-2" (click)="createEmptyComponenet()"> Add Contato </button>
-          <button class="btn btn-info" (click)="savePerson()">Salvar</button>
+
+        <div>
+            <button class="btn btn-info mr-3" (click)="savePerson()">Salvar</button>
+            <button class="btn" (click)="navigateBack()">Voltar</button>
         </div>
+
       </div>
-
-
 
     </form>
 
