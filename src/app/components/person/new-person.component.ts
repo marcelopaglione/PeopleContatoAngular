@@ -4,7 +4,7 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 import { ReponseMessage, Contato, Page } from 'src/app/Entities';
 import { NewContatoComponent } from '../contato/new-contato.component';
 import { Router, ActivatedRoute  } from '@angular/router';
-import { isNull, isUndefined } from 'util';
+import { isNull } from 'util';
 
 @Component({
   selector: 'app-new-person',
@@ -181,6 +181,8 @@ export class NewPersonComponent implements OnInit {
         }
       });
     } else {
+      this.response.message = 'Os valores informados estão inválidos, tente novamente!';
+      this.response.status = 'warning';
       console.log('Invalid boleto form: ' + JSON.stringify(this.fg.value));
     }
   }
