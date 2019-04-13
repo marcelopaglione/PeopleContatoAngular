@@ -7,6 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from '../alert/alert.component';
 import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { By } from '@angular/platform-browser';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -35,4 +36,6 @@ describe('HomeComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
 });

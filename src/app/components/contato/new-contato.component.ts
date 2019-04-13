@@ -40,7 +40,6 @@ export class NewContatoComponent implements OnInit {
       name: [null, Validators.required],
       person: [this.importedPerson, Validators.required]
     });
-    console.log(`New Component for person ${JSON.stringify(this.importedPerson)}`);
   }
 
 }

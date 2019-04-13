@@ -48,8 +48,7 @@ export class ManagerPersonComponent implements OnInit {
     this.setApplicationTitle();
   }
 
-  private setApplicationTitle() {
-    console.log(this.fg.value);
+   setApplicationTitle() {
     if (isNull(this.fg.value.id)) {
       this.title = 'Cadastrar Nova Pessoa';
     } else {
@@ -57,19 +56,16 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-  private initializePageData() {
+   initializePageData() {
     this.initializeForm();
     this.cleanContatos();
-
     this.loadPerson();
   }
 
-  private loadPerson() {
+   loadPerson() {
     if (this.idFromUrlParam) {
       this.api.getPersonById(this.idFromUrlParam)
       .subscribe(person => {
-        console.log('loading person data :');
-        console.log(person);
         this.fg.patchValue(person.body);
         this.fg.patchValue({birthDate: this.formatDate(person.body.birthDate.toString())});
         this.setApplicationTitle();
@@ -79,7 +75,7 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-  private loadContatos() {
+   loadContatos() {
     if (this.idFromUrlParam) {
       this.api.getContatoByPersonId(this.idFromUrlParam)
       .subscribe(paginatedContatos => {
@@ -90,7 +86,7 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-  private cleanContatos()  {
+   cleanContatos()  {
     this.componentsReferences.map(contato => {
       this.cleanComponents(contato.instance.index);
       this.idFromUrlParam = null;
@@ -98,7 +94,7 @@ export class ManagerPersonComponent implements OnInit {
     });
   }
 
-  private initializeForm() {
+   initializeForm() {
     this.fg = this.formBuilder.group({
       id: [null],
       name: [null, Validators.required],
@@ -107,7 +103,7 @@ export class ManagerPersonComponent implements OnInit {
     });
   }
 
-  private isContatosInvalid() {
+   isContatosInvalid() {
     let contatIsInvalid = false;
     this.componentsReferences.map(contato => {
         if (!contato.instance.fg.value.name) {
@@ -120,7 +116,7 @@ export class ManagerPersonComponent implements OnInit {
     return contatIsInvalid;
   }
 
-  private getContatos() {
+   getContatos() {
     const contatos = [];
     this.componentsReferences.map(contato => {
       const contatoForm: Contato = contato.instance.fg.value;
@@ -130,20 +126,20 @@ export class ManagerPersonComponent implements OnInit {
     return contatos;
   }
 
-  private isBirthDateInvalid() {
+   isBirthDateInvalid() {
     if (!this.validateDate(this.fg.value.birthDate)) {
-      this.response.message = 'O formato da data de nascimento está incorreto';
+      this.response.message = 'Data de nascimento está inválida';
       this.response.status = 'warning';
       return true;
     }
     return false;
   }
 
-  private formatDateFromUserInput() {
+   formatDateFromUserInput() {
     this.fg.patchValue({birthDate: this.toDate(this.fg.value.birthDate)});
   }
 
-  private formatDate(dateToFormt: string) {
+   formatDate(dateToFormt: string) {
     const dateArray = dateToFormt.substr(0, 10).split('-');
     const day = dateArray[2];
     const month = dateArray[1];
@@ -151,7 +147,7 @@ export class ManagerPersonComponent implements OnInit {
     return day + '/' + month + '/' + year;
   }
 
-  public createEntityToPersist() {
+   createEntityToPersist() {
     const saveEntity = {
       contatos: this.getContatos(),
       person: this.fg.value
@@ -159,34 +155,35 @@ export class ManagerPersonComponent implements OnInit {
     return saveEntity;
   }
 
-  public savePerson() {
-    if (this.fg.valid) {
-      if (this.isBirthDateInvalid()) { return; }
-      if (this.isContatosInvalid()) { return; }
-      this.formatDateFromUserInput();
-      const entityToPersist = this.createEntityToPersist();
-
-      this.api.savePersonAndContato(entityToPersist).subscribe(data => {
-        if (data.status === 200) {
-          this.response.message = `${this.fg.value.name} foi salvo com sucesso!`;
-          this.response.status = 'success';
-          this.initializePageData();
-        }
-      }, err => {
-        console.log(err);
-        if (err.status === 400) {
-          this.response.message = 'Os valores informados estão inválidos, tente novamente!';
-          this.response.status = 'warning';
-        } else {
-          this.response.message = err.error.message;
-          this.response.status = 'danger';
-        }
-      });
-    } else {
-      this.response.message = 'Os valores informados estão inválidos, tente novamente!';
-      this.response.status = 'warning';
-      console.log('Invalid boleto form: ' + JSON.stringify(this.fg.value));
+   isValidFormToSubmit() {
+    if (!this.fg.valid || (this.isBirthDateInvalid()) || (this.isContatosInvalid()) ) {
+      return false;
     }
+
+    return true;
+  }
+
+   savePerson() {
+    if (!this.isValidFormToSubmit()) {
+      return;
+    }
+    this.formatDateFromUserInput();
+    const entityToPersist = this.createEntityToPersist();
+    this.api.savePersonAndContato(entityToPersist).subscribe(data => {
+      if (data.status === 200) {
+        this.response.message = `${this.fg.value.name} foi salvo com sucesso!`;
+        this.response.status = 'success';
+        this.initializePageData();
+      }
+    }, err => {
+      if (err.status === 400) {
+        this.response.message = 'Os valores informados estão inválidos, tente novamente!';
+        this.response.status = 'warning';
+      } else {
+        this.response.message = err.error.message;
+        this.response.status = 'danger';
+      }
+    });
   }
 
   createComponent(contato: Contato) {
@@ -208,10 +205,9 @@ export class ManagerPersonComponent implements OnInit {
     this.createComponent(null);
   }
 
-  private cleanComponents(index: number) {
+  cleanComponents(index: number) {
     const componentRef = this.componentsReferences.filter(x => x.instance.index === index)[0];
     this.removeVisualComponent(componentRef, index);
-
   }
 
   remove(index: number) {
@@ -241,26 +237,26 @@ export class ManagerPersonComponent implements OnInit {
     });
   }
 
-  private removeVisualComponent(componentRef: any, index: number) {
+   removeVisualComponent(componentRef: any, index: number) {
     const vcrIndex: number = this.VCR.indexOf(componentRef);
     this.VCR.remove(vcrIndex);
     this.componentsReferences = this.componentsReferences.filter(x => x.instance.index !== index);
   }
 
-  private toDate(dateStr): Date {
-    const [day, month, year] = dateStr.split('/');
+   toDate(dateStr): Date {
+    const [day, month, year] = dateStr.toString().split('/');
     return new Date(year, month - 1, day);
   }
 
-  private validateDate(date: string): boolean {
-    const isValidDate = this.toDate(date);
-    if (!isValidDate.getDate()) {
+   validateDate(date: string): boolean {
+    const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
+    if (!(dateRegex.test(date))) {
       return false;
     }
     return true;
   }
 
-  public navigateBack() {
+   navigateBack() {
     this.router.navigate(['home']);
   }
 

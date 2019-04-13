@@ -104,7 +104,6 @@ export class HomeComponent implements OnInit {
   }
 
   public gotoPage(pageNumber: number) {
-    console.log('goto to page '+ pageNumber);
     this.page.number = pageNumber;
     this.updateListViewAtPage();
   }

@@ -42,7 +42,7 @@ export class ViewPersonComponent implements OnInit {
   private validateUrlParameter() {
     // tslint:disable-next-line: triple-equals
     if (this.idFromUrlParam == 0 || this.idFromUrlParam || isNaN(this.idFromUrlParam)) {
-      console.log('nativate to home');
+      // console.log('nativate to home');
     }
   }
 

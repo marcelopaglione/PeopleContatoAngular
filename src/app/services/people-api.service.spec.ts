@@ -9,12 +9,18 @@ describe('PeopleApiService', () => {
     imports: [HttpClientModule]
   }));
 
+
+
   it('should be created', () => {
     const service: PeopleApiService = TestBed.get(PeopleApiService);
     expect(service).toBeTruthy();
   });
 
   it('should get a paginated list of people', (done) => {
+
+
+
+
     const service: PeopleApiService = TestBed.get(PeopleApiService);
 
     const page: Page = {
@@ -39,6 +45,7 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a ist of contatos', (done) => {
+
     const service: PeopleApiService = TestBed.get(PeopleApiService);
 
     const page: Page = {
@@ -132,7 +139,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist a person', (done) => {
-    console.log(new Date());
     const service: PeopleApiService = TestBed.get(PeopleApiService);
     const person: Person = {
       name: 'Beatiful Name',
@@ -209,7 +215,6 @@ describe('PeopleApiService', () => {
     service.savePersonAndContato(saveEntity)
     .subscribe(data => {
       expect(data.status).toBe(200);
-      console.log(data);
       done();
     });
     expect(service).toBeTruthy();
