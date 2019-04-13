@@ -63,19 +63,7 @@ describe('PeopleApiService', () => {
   it('should get a paginated list of contatos by personId', (done) => {
     const service: PeopleApiService = TestBed.get(PeopleApiService);
 
-    const page: Page = {
-      content: null,
-      last: false,
-      totalElements: 51,
-      totalPages: 11,
-      number: 0,
-      size: 5,
-      numberOfElements: 5,
-      first: false,
-      empty: false
-    };
-
-    service.getContatoByPersonId(1, page).subscribe(data => {
+    service.getContatoByPersonId(1).subscribe(data => {
       expect(data.status).toBe(200);
       done();
     });

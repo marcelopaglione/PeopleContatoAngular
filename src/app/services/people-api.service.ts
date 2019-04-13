@@ -119,12 +119,10 @@ export class PeopleApiService {
       );
   }
 
-  public getContatoByPersonId(id: number, page: Page): Observable<HttpResponse<Contato[]>> {
+  public getContatoByPersonId(id: number): Observable<HttpResponse<Contato[]>> {
     return this.http
       .get<Contato[]>(
-        `${this.API}contatos/findByPersonId/${id}?size=${page.size}&page=${
-          page.number
-        }`,
+        `${this.API}contatos/findByPersonId/${id}`,
         {
           headers: this.getHeaders(),
           observe: 'response'

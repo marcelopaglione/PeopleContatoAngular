@@ -27,8 +27,15 @@ export class ViewPersonComponent implements OnInit {
   private loadPersonAndItsContatos() {
     this.api.getPersonById(this.idFromUrlParam)
     .subscribe(person => {
-      console.log(JSON.stringify(person));
+      this.person = person.body;
+      this.loadContatos(person.body.id);
+    });
+  }
 
+  private loadContatos(id: number) {
+    this.api.getContatoByPersonId(id)
+    .subscribe(contatos => {
+      this.contatos = contatos.body;
     });
   }
 
@@ -37,6 +44,14 @@ export class ViewPersonComponent implements OnInit {
     if (this.idFromUrlParam == 0 || this.idFromUrlParam || isNaN(this.idFromUrlParam)) {
       console.log('nativate to home');
     }
+  }
+
+  public navigateBack() {
+    this.router.navigate(['home']);
+  }
+
+  public editPerson() {
+    this.router.navigate([`person/${this.person.id}`]);
   }
 
 }

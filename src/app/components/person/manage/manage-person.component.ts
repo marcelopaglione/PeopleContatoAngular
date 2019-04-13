@@ -81,7 +81,7 @@ export class ManagerPersonComponent implements OnInit {
 
   private loadContatos() {
     if (this.idFromUrlParam) {
-      this.api.getContatoByPersonId(this.idFromUrlParam, this.page)
+      this.api.getContatoByPersonId(this.idFromUrlParam)
       .subscribe(paginatedContatos => {
         paginatedContatos.body.map(contato => {
           this.createComponent(contato);

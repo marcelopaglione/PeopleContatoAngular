@@ -113,6 +113,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate([`person/${personId}`]);
   }
 
+  public viewDetails(personId: number) {
+    this.router.navigate([`details/${personId}`]);
+  }
+
   private updateListViewAtPage() {
     if (this.searchString !== '') {
       this.search();
