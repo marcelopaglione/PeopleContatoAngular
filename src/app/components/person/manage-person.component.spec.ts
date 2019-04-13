@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewPersonComponent } from './new-person.component';
+import { ManagerPersonComponent } from './manage-person.component';
 import { TitleComponent } from '../title/title.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -8,9 +8,9 @@ import { AlertComponent } from '../alert/alert.component';
 import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-describe('NewPersonComponent', () => {
-  let component: NewPersonComponent;
-  let fixture: ComponentFixture<NewPersonComponent>;
+describe('ManagerPersonComponent', () => {
+  let component: ManagerPersonComponent;
+  let fixture: ComponentFixture<ManagerPersonComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -21,7 +21,7 @@ describe('NewPersonComponent', () => {
         RouterTestingModule
       ],
       declarations: [
-        NewPersonComponent,
+        ManagerPersonComponent,
         TitleComponent,
         AlertComponent
       ]
@@ -30,7 +30,7 @@ describe('NewPersonComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NewPersonComponent);
+    fixture = TestBed.createComponent(ManagerPersonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
+import { isUndefined, isNull } from 'util';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +58,11 @@ export class PeopleApiService {
   }
 
   public savePersonAndContato(entity: PersonContatoEntity): any {
-    return this.http.post<any>(`${this.API}contatos/savePersonAndContatos/`, entity, this.getHeader());
+    if (entity.person.id === 0 || isUndefined(entity.person.id) || isNull(entity.person.id)) {
+      return this.http.post<any>(`${this.API}contatos/savePersonAndContatos/`, entity, this.getHeader());
+    } else {
+      return this.http.put<any>(`${this.API}contatos/updatePersonAndContatos/`, entity, this.getHeader());
+    }
   }
 
   public deletePersonById(id: number): any {

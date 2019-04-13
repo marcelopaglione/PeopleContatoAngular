@@ -7,11 +7,11 @@ import { Router, ActivatedRoute  } from '@angular/router';
 import { isNull } from 'util';
 
 @Component({
-  selector: 'app-new-person',
-  templateUrl: './new-person.component.html',
-  styleUrls: ['./new-person.component.scss']
+  selector: 'app-manage-person',
+  templateUrl: './manage-person.component.html',
+  styleUrls: ['./manage-person.component.scss']
 })
-export class NewPersonComponent implements OnInit {
+export class ManagerPersonComponent implements OnInit {
 
   @ViewChild('viewContainerRef', { read: ViewContainerRef }) VCR: ViewContainerRef;
 
