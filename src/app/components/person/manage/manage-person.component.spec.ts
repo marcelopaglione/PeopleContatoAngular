@@ -5,12 +5,11 @@ import { TitleComponent } from '../../title/title.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from '../../alert/alert.component';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { By } from '@angular/platform-browser';
-import { Person, Contato } from 'src/app/Entities';
+import { Person } from 'src/app/Entities';
 import { PeopleApiService } from 'src/app/services/people-api.service';
-import { Observable } from 'rxjs';
+import { NewContatoComponent } from '../../contato/new-contato.component';
 
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
@@ -20,6 +19,7 @@ describe('ManagerPersonComponent', () => {
   let inputElementRG: HTMLInputElement;
   let inputElementBirthDate: HTMLInputElement;
   let inputElementButtonSave: HTMLInputElement;
+  let router: Router;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -32,10 +32,12 @@ describe('ManagerPersonComponent', () => {
       declarations: [
         ManagerPersonComponent,
         TitleComponent,
-        AlertComponent
+        AlertComponent,
+        NewContatoComponent
       ]
     })
     .compileComponents();
+    router = TestBed.get(Router);
   }));
 
   beforeEach(() => {
@@ -89,37 +91,6 @@ describe('ManagerPersonComponent', () => {
     return fixture.whenStable();
   }
 
-  it('should validate form submition', () => {/*
-    const person = {
-      id: 0,
-      name: 'should persist a person',
-      birthDate: '10/10/2010',
-      rg: '1010101050'
-    };
-    component.ngOnInit();
-    component.fg.patchValue(person);
-    spyOn(component, 'isValidFormToSubmit');
-    spyOn(component, 'isBirthDateInvalid');
-
-    component.isValidFormToSubmit();
-
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(component.isValidFormToSubmit).toHaveBeenCalled();
-      expect(component.isBirthDateInvalid).toHaveBeenCalled();
-
-      console.log('status:' + component.response.status);
-      console.log('message:' + component.response.message);
-
-      console.log('savePerson was called');
-      // expect(component.fg.valid).toBeTruthy();
-      done();
-    });*/
-
-    // const compiled = fixture.debugElement.nativeElement;
-    // expect(compiled.querySelector('#novoJogo').textContent).toContain('Novo Jogo');
-  });
-
   it('should validate birthDate', () => {
     let date = '31/12/2050';
     let dateValidateResult = component.validateDate(date);
@@ -164,20 +135,28 @@ describe('ManagerPersonComponent', () => {
     expect(component.title).toBe('Editar Pessoa');
   });
 
-  it('should load contatos from database', () => {
-   /* component.idFromUrlParam = 1;
-    const contato: Contato[] = [{ name: 'Contato Name', id: 1, person: null }];
-    spyOn(component, 'loadContatos').and.callThrough();
-    spyOn(service, 'getContatoByPersonId').and.returnValue(Promise.resolve(contato));
-
-    component.loadContatos();
-
-
+  it('should create an empty contato', (done) => {
+    spyOn(component, 'ngOnInit').and.callThrough();
+    const spycreateEmptyComponenet = spyOn(component, 'createEmptyComponenet').and.callThrough();
+    spyOn(component, 'createComponent').and.callThrough();
+    component.ngOnInit();
+    inputElementButtonSave = fixture.nativeElement.querySelector('button[id=addNewContato]');
+    fixture.detectChanges();
+    const button = fixture.debugElement.nativeElement.querySelector('#addNewContato');
+    button.click();
+    fixture.detectChanges();
     fixture.whenStable().then(() => {
       fixture.detectChanges();
-      expect(component.loadContatos).toHaveBeenCalled();
+      expect(spycreateEmptyComponenet).toHaveBeenCalled();
       done();
-    });*/
-  });
+    });
+
+   });
+
+  it('should be able to navigate to `/home`', (() => {
+    const navigateSpy = spyOn(router, 'navigate');
+    component.navigateBack();
+    expect(navigateSpy).toHaveBeenCalledWith(['home']);
+  }));
 
 });

@@ -11,20 +11,21 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 export class ViewPersonComponent implements OnInit {
 
   idFromUrlParam = 0;
-  person: Person;
+  person: Person = {id: 0, rg: '', name: '', birthDate: null};
   contatos: Contato[] = [];
+
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private api: PeopleApiService) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; }); }
+    private api: PeopleApiService) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; });  }
 
   ngOnInit() {
     this.validateUrlParameter();
     this.loadPersonAndItsContatos();
   }
 
-  private loadPersonAndItsContatos() {
+  loadPersonAndItsContatos() {
     this.api.getPersonById(this.idFromUrlParam)
     .subscribe(person => {
       this.person = person.body;
@@ -32,25 +33,29 @@ export class ViewPersonComponent implements OnInit {
     });
   }
 
-  private loadContatos(id: number) {
+  loadContatos(id: number) {
     this.api.getContatoByPersonId(id)
     .subscribe(contatos => {
-      this.contatos = contatos.body;
+      this.setContatos(contatos.body);
     });
   }
 
-  private validateUrlParameter() {
+  setContatos(contatos: Contato[]) {
+    this.contatos = contatos;
+  }
+
+  validateUrlParameter() {
     // tslint:disable-next-line: triple-equals
     if (this.idFromUrlParam == 0 || this.idFromUrlParam || isNaN(this.idFromUrlParam)) {
       // console.log('nativate to home');
     }
   }
 
-  public navigateBack() {
+  navigateBack() {
     this.router.navigate(['home']);
   }
 
-  public editPerson() {
+  editPerson() {
     this.router.navigate([`person/${this.person.id}`]);
   }
 

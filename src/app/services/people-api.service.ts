@@ -215,7 +215,7 @@ export class PeopleApiService {
         );
     } else {
       return this.http
-        .put<any>(`${this.API}contatos/updatePersonAndContatos/`, entity, {
+        .put<any>(`${this.API}contatos/updateContatosAndPeople/`, entity, {
           headers: this.getHeaders(),
           observe: 'response'
         })
