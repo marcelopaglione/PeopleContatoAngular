@@ -23,11 +23,6 @@ describe('MenuComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render new person link button', () => {
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('#newPerson').textContent).toContain('New Person');
-  });
-
   it('should render home link button', () => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('#home').textContent).toContain('Home');

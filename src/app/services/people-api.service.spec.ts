@@ -38,7 +38,7 @@ describe('PeopleApiService', () => {
 
   });
 
-  it('should get a paginated list of contatos', (done) => {
+  it('should get a ist of contatos', (done) => {
     const service: PeopleApiService = TestBed.get(PeopleApiService);
 
     const page: Page = {
@@ -55,8 +55,6 @@ describe('PeopleApiService', () => {
 
     service.getContatos(page).subscribe(data => {
       expect(data.status).toBe(200);
-      expect(data.body.size).toBe(5);
-      expect(data.body.number).toBe(2);
       done();
     });
 
@@ -109,10 +107,21 @@ describe('PeopleApiService', () => {
   it('should get a person by name containing string', (done) => {
     const service: PeopleApiService = TestBed.get(PeopleApiService);
     const nameToSearch = '1';
-    service.getPersonByNameContaining(nameToSearch)
+    const page: Page = {
+      content: null,
+      last: false,
+      totalElements: 51,
+      totalPages: 11,
+      number: 2,
+      size: 5,
+      numberOfElements: 5,
+      first: false,
+      empty: false
+    };
+    service.getPersonByNameContaining(nameToSearch, page)
     .subscribe(data => {
       expect(data.status).toBe(200);
-      data.body.map(person => {
+      data.body.content.map(person => {
         expect(person.name).toContain(nameToSearch);
       });
       done();
