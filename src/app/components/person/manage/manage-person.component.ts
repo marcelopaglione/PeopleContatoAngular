@@ -67,6 +67,7 @@ export class ManagerPersonComponent implements OnInit {
     this.initializeForm();
     this.cleanContatos();
     this.loadPerson();
+    this.setApplicationTitle();
   }
 
   apiLoadPersonFromDatabase() { return this.api.getPersonById(this.idFromUrlParam); }
@@ -145,6 +146,14 @@ export class ManagerPersonComponent implements OnInit {
     return false;
   }
 
+  ifFormGroupInvalid() {
+    if (!this.fg.valid ) {
+      this.setResponse({status: 'warning', message: 'Formulário inválido'});
+      return true;
+    }
+    return false;
+  }
+
   formatDateFromUserInput() {
     this.fg.patchValue({ birthDate: this.toDate(this.fg.value.birthDate) });
   }
@@ -166,7 +175,7 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   isValidFormToSubmit() {
-    if (!this.fg.valid || this.isBirthDateInvalid() || this.isContatosInvalid()) {
+    if (this.ifFormGroupInvalid() || this.isBirthDateInvalid() || this.isContatosInvalid()) {
       return false;
     }
     return true;

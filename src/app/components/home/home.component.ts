@@ -13,9 +13,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private api: PeopleApiService,
     private router: Router
-  ) { }
-
-  people: Person[];
+  ) {  }
 
   searchString = '';
   page: Page = {
@@ -43,15 +41,7 @@ export class HomeComponent implements OnInit {
   }
 
   setPaginatedDataIntoPeople(paginatedPeople: any) {
-    this.people = paginatedPeople.body.content;
-    this.page.first = paginatedPeople.body.first;
-    this.page.last = paginatedPeople.body.last;
-    this.page.totalElements = paginatedPeople.body.totalElements;
-    this.page.totalPages = paginatedPeople.body.totalPages;
-    this.page.number = paginatedPeople.body.number;
-    this.page.size = paginatedPeople.body.size;
-    this.page.numberOfElements = paginatedPeople.body.numberOfElements;
-    this.page.empty = paginatedPeople.body.empty;
+    this.page = paginatedPeople.body;
   }
 
   editarPerson(personId: number) {

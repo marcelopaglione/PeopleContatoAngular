@@ -22,7 +22,7 @@
 
 
 <div class="table-responsive">
-    <table class="table table-striped" *ngIf="people">
+    <table class="table table-striped" *ngIf="page.content">
         <thead>
           <tr>
             <th scope="col">id</th>
@@ -33,10 +33,10 @@
           </tr>
         </thead>
         <tbody>
-          <td *ngIf="people.length === 0" class="emptyList">
+          <td *ngIf="page.content.length === 0" class="emptyList">
             Lista vazia
           </td>
-          <tr *ngFor="let item of people">
+          <tr *ngFor="let item of page.content">
             <th scope="row">{{item.id}}</th>
             <td>{{item.name}}</td>
             <td>{{item.rg}}</td>
