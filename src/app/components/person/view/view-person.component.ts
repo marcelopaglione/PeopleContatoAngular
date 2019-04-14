@@ -21,7 +21,6 @@ export class ViewPersonComponent implements OnInit {
     private api: PeopleApiService) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; });  }
 
   ngOnInit() {
-    this.validateUrlParameter();
     this.loadPersonAndItsContatos();
   }
 
@@ -33,22 +32,19 @@ export class ViewPersonComponent implements OnInit {
     });
   }
 
+  private contatoByPersonId(id) {
+    return this.api.getContatoByPersonId(id);
+  }
+
   loadContatos(id: number) {
-    this.api.getContatoByPersonId(id)
-    .subscribe(contatos => {
+    this.contatoByPersonId(id).toPromise()
+    .then(contatos => {
       this.setContatos(contatos.body);
     });
   }
 
   setContatos(contatos: Contato[]) {
     this.contatos = contatos;
-  }
-
-  validateUrlParameter() {
-    // tslint:disable-next-line: triple-equals
-    if (this.idFromUrlParam == 0 || this.idFromUrlParam || isNaN(this.idFromUrlParam)) {
-      // console.log('nativate to home');
-    }
   }
 
   navigateBack() {

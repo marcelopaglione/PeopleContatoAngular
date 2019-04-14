@@ -1,8 +1,15 @@
-import { Component, OnInit, ComponentRef, ViewChild, ViewContainerRef, ComponentFactoryResolver } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ComponentRef,
+  ViewChild,
+  ViewContainerRef,
+  ComponentFactoryResolver
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { ReponseMessage, Contato, Page } from 'src/app/Entities';
-import { Router, ActivatedRoute  } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { isNull } from 'util';
 import { NewContatoComponent } from '../../contato/new-contato.component';
 
@@ -12,8 +19,8 @@ import { NewContatoComponent } from '../../contato/new-contato.component';
   styleUrls: ['./manage-person.component.scss']
 })
 export class ManagerPersonComponent implements OnInit {
-
-  @ViewChild('viewContainerRef', { read: ViewContainerRef }) VCR: ViewContainerRef;
+  @ViewChild('viewContainerRef', { read: ViewContainerRef })
+  VCR: ViewContainerRef;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -21,12 +28,16 @@ export class ManagerPersonComponent implements OnInit {
     private CFR: ComponentFactoryResolver,
     private route: ActivatedRoute,
     private router: Router
-  ) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; }); }
+  ) {
+    this.route.params.subscribe(params => {
+      this.idFromUrlParam = params.id;
+    });
+  }
 
   title = '';
   idFromUrlParam = 0;
   fg: FormGroup;
-  response: ReponseMessage = {message: '', status: ''};
+  response: ReponseMessage = { message: '', status: '' };
   contatos: Contato[] = [];
   page: Page = {
     content: [],
@@ -41,14 +52,14 @@ export class ManagerPersonComponent implements OnInit {
   };
 
   index = 0;
-  componentsReferences = [];
+  componentsReferences: any[] = [];
 
   ngOnInit() {
     this.initializePageData();
     this.setApplicationTitle();
   }
 
-   setApplicationTitle() {
+  setApplicationTitle() {
     if (isNull(this.fg.value.id)) {
       this.title = 'Cadastrar Nova Pessoa';
     } else {
@@ -56,45 +67,56 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-   initializePageData() {
+  initializePageData() {
     this.initializeForm();
     this.cleanContatos();
     this.loadPerson();
   }
 
-   loadPerson() {
+  apiLoadPersonFromDatabase() {
+    return this.api.getPersonById(this.idFromUrlParam);
+  }
+
+  loadPerson() {
     if (this.idFromUrlParam) {
-      this.api.getPersonById(this.idFromUrlParam)
-      .subscribe(person => {
-        this.fg.patchValue(person.body);
-        this.fg.patchValue({birthDate: this.formatDate(person.body.birthDate.toString())});
-        this.setApplicationTitle();
-      });
+      this.apiLoadPersonFromDatabase()
+        .toPromise()
+        .then(person => {
+          this.fg.patchValue(person.body);
+          this.fg.patchValue({
+            birthDate: this.formatDate(person.body.birthDate.toString())
+          });
+          this.setApplicationTitle();
+        });
 
       this.loadContatos();
     }
   }
 
-   loadContatos() {
+  apiGetContatoByPersonId() {
+    return this.api.getContatoByPersonId(this.idFromUrlParam);
+  }
+
+  loadContatos() {
     if (this.idFromUrlParam) {
-      this.api.getContatoByPersonId(this.idFromUrlParam)
-      .subscribe(paginatedContatos => {
-        paginatedContatos.body.map(contato => {
-          this.createComponent(contato);
+      this.apiGetContatoByPersonId()
+        .toPromise()
+        .then(contatos => {
+          contatos.body.map(contato => {
+            this.createComponent(contato);
+          });
         });
-      });
     }
   }
 
-   cleanContatos()  {
+  cleanContatos() {
     this.componentsReferences.map(contato => {
       this.cleanComponents(contato.instance.index);
       this.idFromUrlParam = null;
-
     });
   }
 
-   initializeForm() {
+  initializeForm() {
     this.fg = this.formBuilder.group({
       id: [null],
       name: [null, Validators.required],
@@ -103,20 +125,20 @@ export class ManagerPersonComponent implements OnInit {
     });
   }
 
-   isContatosInvalid() {
+  isContatosInvalid() {
     let contatIsInvalid = false;
     this.componentsReferences.map(contato => {
-        if (!contato.instance.fg.value.name) {
-          this.response.message = 'Por favor informe o nome dos contatos';
-          this.response.status = 'warning';
-          contatIsInvalid = true;
-          return;
-        }
+      if (!contato.instance.fg.value.name) {
+        this.response.message = 'Por favor informe o nome dos contatos';
+        this.response.status = 'warning';
+        contatIsInvalid = true;
+        return;
+      }
     });
     return contatIsInvalid;
   }
 
-   getContatos() {
+  getContatos() {
     const contatos = [];
     this.componentsReferences.map(contato => {
       const contatoForm: Contato = contato.instance.fg.value;
@@ -126,7 +148,7 @@ export class ManagerPersonComponent implements OnInit {
     return contatos;
   }
 
-   isBirthDateInvalid() {
+  isBirthDateInvalid() {
     if (!this.validateDate(this.fg.value.birthDate)) {
       this.response.message = 'Data de nascimento está inválida';
       this.response.status = 'warning';
@@ -135,11 +157,11 @@ export class ManagerPersonComponent implements OnInit {
     return false;
   }
 
-   formatDateFromUserInput() {
-    this.fg.patchValue({birthDate: this.toDate(this.fg.value.birthDate)});
+  formatDateFromUserInput() {
+    this.fg.patchValue({ birthDate: this.toDate(this.fg.value.birthDate) });
   }
 
-   formatDate(dateToFormt: string) {
+  formatDate(dateToFormt: string) {
     const dateArray = dateToFormt.substr(0, 10).split('-');
     const day = dateArray[2];
     const month = dateArray[1];
@@ -147,7 +169,7 @@ export class ManagerPersonComponent implements OnInit {
     return day + '/' + month + '/' + year;
   }
 
-   createEntityToPersist() {
+  createEntityToPersist() {
     const saveEntity = {
       contatos: this.getContatos(),
       person: this.fg.value
@@ -155,40 +177,54 @@ export class ManagerPersonComponent implements OnInit {
     return saveEntity;
   }
 
-   isValidFormToSubmit() {
-    if (!this.fg.valid || (this.isBirthDateInvalid()) || (this.isContatosInvalid()) ) {
+  isValidFormToSubmit() {
+    if (
+      !this.fg.valid ||
+      this.isBirthDateInvalid() ||
+      this.isContatosInvalid()
+    ) {
       return false;
     }
 
     return true;
   }
 
-   savePerson() {
+  savePerson() {
     if (!this.isValidFormToSubmit()) {
       return;
     }
     this.formatDateFromUserInput();
     const entityToPersist = this.createEntityToPersist();
-    this.api.savePersonAndContato(entityToPersist).subscribe(data => {
-      if (data.status === 200) {
-        this.response.message = `${this.fg.value.name} foi salvo com sucesso!`;
-        this.response.status = 'success';
-        this.initializePageData();
+    this.api.savePersonAndContato(entityToPersist).subscribe(
+      data => {
+        if (data.status === 200) {
+          this.response.message = `${
+            this.fg.value.name
+          } foi salvo com sucesso!`;
+          this.response.status = 'success';
+          this.initializePageData();
+        }
+      },
+      err => {
+        if (err.status === 400) {
+          this.response.message =
+            'Os valores informados estão inválidos, tente novamente!';
+          this.response.status = 'warning';
+        } else {
+          this.response.message = err.error.message;
+          this.response.status = 'danger';
+        }
       }
-    }, err => {
-      if (err.status === 400) {
-        this.response.message = 'Os valores informados estão inválidos, tente novamente!';
-        this.response.status = 'warning';
-      } else {
-        this.response.message = err.error.message;
-        this.response.status = 'danger';
-      }
-    });
+    );
   }
 
   createComponent(contato: Contato) {
-    const componentFactory = this.CFR.resolveComponentFactory(NewContatoComponent);
-    const componentRef: ComponentRef<NewContatoComponent> = this.VCR.createComponent(componentFactory);
+    const componentFactory = this.CFR.resolveComponentFactory(
+      NewContatoComponent
+    );
+    const componentRef: ComponentRef<
+      NewContatoComponent
+    > = this.VCR.createComponent(componentFactory);
     const currentComponent = componentRef.instance;
     currentComponent.selfRef = currentComponent;
     currentComponent.index = ++this.index;
@@ -206,7 +242,9 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   cleanComponents(index: number) {
-    const componentRef = this.componentsReferences.filter(x => x.instance.index === index)[0];
+    const componentRef = this.componentsReferences.filter(
+      x => x.instance.index === index
+    )[0];
     this.removeVisualComponent(componentRef, index);
   }
 
@@ -214,50 +252,61 @@ export class ManagerPersonComponent implements OnInit {
     if (this.VCR.length < 1) {
       return;
     }
-    const componentRef = this.componentsReferences.filter(x => x.instance.index === index)[0];
+    const componentRef = this.componentsReferences.filter(
+      x => x.instance.index === index
+    )[0];
 
     if (isNull(componentRef.instance.fg.value.id)) {
       this.removeVisualComponent(componentRef, index);
       return;
     }
 
-    if (!confirm(`Você ter certeza que deseja remover ${componentRef.instance.fg.value.name}`)) {
+    if (
+      !confirm(
+        `Você ter certeza que deseja remover ${
+          componentRef.instance.fg.value.name
+        }`
+      )
+    ) {
       return;
     }
 
-    this.api.deleteContatoById(componentRef.instance.fg.value.id).subscribe(data => {
-      if (data.status === 200) {
-        this.removeVisualComponent(componentRef, index);
-        this.response.message = `Contato Removido com sucesso`;
-        this.response.status = 'success';
-      } else {
-        this.response.message = `Não foi possível remover contato, Por favor tente novamente mais tarde`;
-        this.response.status = 'warning';
-      }
-    });
+    this.api
+      .deleteContatoById(componentRef.instance.fg.value.id)
+      .subscribe(data => {
+        if (data.status === 200) {
+          this.removeVisualComponent(componentRef, index);
+          this.response.message = `Contato Removido com sucesso`;
+          this.response.status = 'success';
+        } else {
+          this.response.message = `Não foi possível remover contato, Por favor tente novamente mais tarde`;
+          this.response.status = 'warning';
+        }
+      });
   }
 
-   removeVisualComponent(componentRef: any, index: number) {
+  removeVisualComponent(componentRef: any, index: number) {
     const vcrIndex: number = this.VCR.indexOf(componentRef);
     this.VCR.remove(vcrIndex);
-    this.componentsReferences = this.componentsReferences.filter(x => x.instance.index !== index);
+    this.componentsReferences = this.componentsReferences.filter(
+      x => x.instance.index !== index
+    );
   }
 
-   toDate(dateStr): Date {
+  toDate(dateStr): Date {
     const [day, month, year] = dateStr.toString().split('/');
     return new Date(year, month - 1, day);
   }
 
-   validateDate(date: string): boolean {
+  validateDate(date: string): boolean {
     const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
-    if (!(dateRegex.test(date))) {
+    if (!dateRegex.test(date)) {
       return false;
     }
     return true;
   }
 
-   navigateBack() {
+  navigateBack() {
     this.router.navigate(['home']);
   }
-
 }

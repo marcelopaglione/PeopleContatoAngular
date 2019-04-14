@@ -33,7 +33,7 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     ReactiveFormsModule,
     HttpClientModule
   ],
-  entryComponents: [NewContatoComponent],
+  entryComponents: [ NewContatoComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   providers: [],
   bootstrap: [AppComponent]

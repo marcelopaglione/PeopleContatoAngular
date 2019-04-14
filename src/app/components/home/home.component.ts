@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit {
     this.loadPeoplePaginatedFromDatabase();
   }
 
-  private loadPeoplePaginatedFromDatabase() {
+  public loadPeoplePaginatedFromDatabase() {
     this.api.getPeople(this.page).subscribe(paginatedPeople => {
       this.setPaginatedDataIntoPeople(paginatedPeople);
     });
@@ -84,19 +84,21 @@ export class HomeComponent implements OnInit {
     this.search();
   }
 
-  private search() {
+  public apiGetPersonByNameContaining() { return this.api.getPersonByNameContaining(this.searchString, this.page); }
+
+  public search() {
     if (this.searchString === '') {
       this.loadPeoplePaginatedFromDatabase();
       return;
     }
 
-    this.api.getPersonByNameContaining(this.searchString, this.page)
-    .subscribe(paginatedPeople => {
+    this.apiGetPersonByNameContaining().toPromise()
+    .then(paginatedPeople => {
       this.setPaginatedDataIntoPeople(paginatedPeople);
     });
   }
 
-  private updateListViewAtPage() {
+  public updateListViewAtPage() {
     if (this.searchString !== '') {
       this.search();
     } else {

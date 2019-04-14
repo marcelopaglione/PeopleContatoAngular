@@ -7,9 +7,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from '../../alert/alert.component';
 import { RouterModule, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { Person } from 'src/app/Entities';
+import { Person, Contato } from 'src/app/Entities';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { NewContatoComponent } from '../../contato/new-contato.component';
+import { Observable } from 'rxjs';
 
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
@@ -135,28 +136,130 @@ describe('ManagerPersonComponent', () => {
     expect(component.title).toBe('Editar Pessoa');
   });
 
-  it('should create an empty contato', (done) => {
-    spyOn(component, 'ngOnInit').and.callThrough();
-    const spycreateEmptyComponenet = spyOn(component, 'createEmptyComponenet').and.callThrough();
-    spyOn(component, 'createComponent').and.callThrough();
-    component.ngOnInit();
-    inputElementButtonSave = fixture.nativeElement.querySelector('button[id=addNewContato]');
-    fixture.detectChanges();
-    const button = fixture.debugElement.nativeElement.querySelector('#addNewContato');
-    button.click();
-    fixture.detectChanges();
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(spycreateEmptyComponenet).toHaveBeenCalled();
-      done();
-    });
-
-   });
 
   it('should be able to navigate to `/home`', (() => {
     const navigateSpy = spyOn(router, 'navigate');
     component.navigateBack();
     expect(navigateSpy).toHaveBeenCalledWith(['home']);
+  }));
+
+
+  it('should validate form before submit return true', (() => {
+
+    component.fg.patchValue({id: null});
+    const date = '31/01/2050';
+    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({name: 'NameName'});
+    component.fg.patchValue({rg: '050505050'});
+
+    const spyisValidFormToSubmit = spyOn(component, 'isValidFormToSubmit').and.callThrough();
+    const spyisBirthDateInvalid = spyOn(component, 'isBirthDateInvalid').and.callThrough();
+    const spyisContatosInvalid = spyOn(component, 'isContatosInvalid').and.callThrough();
+
+    const response = component.isValidFormToSubmit();
+
+    expect(spyisBirthDateInvalid).toHaveBeenCalled();
+    expect(spyisContatosInvalid).toHaveBeenCalled();
+    expect(spyisValidFormToSubmit).toHaveBeenCalled();
+
+    expect(response).toBe(true);
+
+  }));
+
+
+  it('should validate form before submit return false', (() => {
+
+    component.fg.patchValue({id: null});
+    component.fg.patchValue({name: 'NameName'});
+
+    const spyisValidFormToSubmit = spyOn(component, 'isValidFormToSubmit').and.callThrough();
+    const spyisBirthDateInvalid = spyOn(component, 'isBirthDateInvalid').and.callThrough();
+    const spyisContatosInvalid = spyOn(component, 'isContatosInvalid').and.callThrough();
+
+    const response = component.isValidFormToSubmit();
+
+    expect(spyisBirthDateInvalid).toHaveBeenCalledTimes(0);
+    expect(spyisContatosInvalid).toHaveBeenCalledTimes(0);
+    expect(spyisValidFormToSubmit).toHaveBeenCalled();
+
+    expect(response).toBe(false);
+  }));
+
+  it('should create a valid entity to persist', (() => {
+    const contato: Contato = {
+      id: 1,
+      name: 'contato',
+      person: null
+    };
+    component.fg.patchValue({id: null});
+    const date = '31/01/2050';
+    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({name: 'NameName'});
+    component.fg.patchValue({rg: '050505050'});
+    const person = component.fg.value;
+
+    spyOn(component, 'getContatos').and.returnValue([contato]);
+
+    const entityToPersist = component.createEntityToPersist();
+    expect(entityToPersist.person).toEqual(person);
+    expect(entityToPersist.contatos).toEqual([contato]);
+
+  }));
+
+
+  it('should create return a valid list of contatos', (() => {
+    component.fg.patchValue({id: null});
+    const date = '31/01/2050';
+    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({name: 'NameName'});
+    component.fg.patchValue({rg: '050505050'});
+    const person = component.fg.value;
+    const objectReference = {
+      instance: {fg: {value: {id: null, name: '', person: {id: null, name: '', birthDate: null, rg: ''}}}}
+    };
+    component.componentsReferences.push(objectReference);
+
+    const contatosList = component.getContatos();
+    expect(contatosList.length).toBeDefined();
+
+  }));
+
+  it('should isContatosInvalid return true', (() => {
+    component.fg.patchValue({id: null});
+    const date = '31/01/2050';
+    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({name: ''});
+    component.fg.patchValue({rg: '050505050'});
+    const person = component.fg.value;
+    const objectReference = {
+      instance: {fg: {value: {id: null, name: '', person: {id: null, name: '', birthDate: null, rg: ''}}}}
+    };
+    component.componentsReferences.push(objectReference);
+
+    const isContatosInvalidReponse = component.isContatosInvalid();
+    expect(isContatosInvalidReponse).toBe(true);
+
+  }));
+
+
+  it('should load a person from the database', (() => {
+
+    const expected = {
+      body: { id: '1', name: 'ABS', birthDate: '10/12/2015', rg: '912931294' },
+      status: 200,
+    };
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(expected);
+        observer.complete();
+      }, 200);
+    });
+    spyOn(component, 'apiLoadPersonFromDatabase').and.returnValue(observable);
+    spyOn(component, 'loadPerson').and.callThrough();
+    spyOn(component, 'loadContatos').and.returnValue(false);
+    component.idFromUrlParam = 1;
+    component.loadPerson();
+
   }));
 
 });

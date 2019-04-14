@@ -57,17 +57,14 @@ export class PaginationComponent implements OnInit {
 
   public changeMaxItemsPerPage(maxItemsPerPage: number) {
     this.page.size = maxItemsPerPage;
+    this.page.number = 0;
     this.eventChangeMaxItemsPerPage.emit({event: 'changeMaxItemsPerPage', page: this.page});
+    this.configureInBetweenPages();
   }
 
-  private updateListViewAtPage() {
-    if (this.searchString !== '') {
-      this.eventChangeMaxItemsPerPage.emit({event: 'search', page: this.page});
-      this.configureInBetweenPages();
-    } else {
-      this.eventChangeMaxItemsPerPage.emit({event: 'loadPeoplePaginatedFromDatabase', page: this.page});
-      this.configureInBetweenPages();
-    }
+  public updateListViewAtPage() {
+    this.eventChangeMaxItemsPerPage.emit({event: 'search', page: this.page});
+    this.configureInBetweenPages();
   }
 
   private configureInBetweenPages() {

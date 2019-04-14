@@ -2,8 +2,6 @@ import {
   async,
   ComponentFixture,
   TestBed,
-  fakeAsync,
-  getTestBed
 } from '@angular/core/testing';
 
 import { ViewPersonComponent } from './view-person.component';
@@ -11,9 +9,9 @@ import { TitleComponent } from '../../title/title.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
-import { of as observableOf} from 'rxjs';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Contato } from 'src/app/Entities';
+import { Observable } from 'rxjs';
 
 describe('ViewPersonComponent', () => {
   let component: ViewPersonComponent;
@@ -26,7 +24,7 @@ describe('ViewPersonComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientModule,
-        RouterModule
+        RouterModule,
       ],
       declarations: [ViewPersonComponent, TitleComponent]
     }).compileComponents();
@@ -37,7 +35,6 @@ describe('ViewPersonComponent', () => {
     fixture = TestBed.createComponent(ViewPersonComponent);
     service = TestBed.get(PeopleApiService);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -64,10 +61,17 @@ describe('ViewPersonComponent', () => {
       person: null
     };
 
-    // spyOn(component, 'loadContatos').and.callThrough();
-    // .and.returnValue([contato1])
-    const spyloadContatos = spyOn(component, 'loadContatos');
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(contato1);
+        console.log('am done');
+        observer.complete();
+      }, 1000);
+    });
+
+    const spyloadContatos = spyOn(component, 'loadContatos').and.returnValue(observable);
     const spysetContatos = spyOn(component, 'setContatos').and.callThrough();
+
     component.loadContatos(1);
     component.setContatos([contato1]);
     expect(spyloadContatos).toHaveBeenCalled();

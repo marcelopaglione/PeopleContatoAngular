@@ -11,15 +11,19 @@ export interface ContatoInterface {
 })
 export class NewContatoComponent {
 
-  constructor() { }
+  constructor(private formBuilder: FormBuilder) { }
 
-  fg: FormGroup;
+  fg: FormGroup = this.formBuilder.group({
+    id: [null],
+    name: [null, Validators.required],
+    person: [null],
+  });
   public index: number;
   public selfRef: NewContatoComponent;
   public compInteraction: ContatoInterface;
 
   removeMe(index) {
-    this.compInteraction.remove(index);
+    if (this.compInteraction) { this.compInteraction.remove(index); }
   }
 
 }
