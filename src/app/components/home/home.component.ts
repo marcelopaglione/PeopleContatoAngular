@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   ) { }
 
   people: Person[];
-  inBetweenPages: number[] = [];
+
   searchString = '';
   page: Page = {
     content: [],
@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
     totalElements: 0,
     totalPages: 0,
     number: 0,
-    size: 10,
+    size: 5,
     numberOfElements: 0,
     empty: true
   };
@@ -37,7 +37,6 @@ export class HomeComponent implements OnInit {
   private loadPeoplePaginatedFromDatabase() {
     this.api.getPeople(this.page).subscribe(paginatedPeople => {
       this.setPaginatedDataIntoPeople(paginatedPeople);
-      this.configureInBetweenPages();
     });
   }
 
@@ -53,61 +52,12 @@ export class HomeComponent implements OnInit {
     this.page.empty = paginatedPeople.body.empty;
   }
 
-  private configureInBetweenPages() {
-    const curretPage = this.page.number + 1;
-    const totalPages = this.page.totalPages;
-    this.inBetweenPages = [];
-
-    if (curretPage > 10) { this.inBetweenPages.push(curretPage - 10); }
-    if (curretPage > 5) { this.inBetweenPages.push(curretPage - 5); }
-    if (curretPage > 2) { this.inBetweenPages.push(curretPage - 2); }
-    if (curretPage > 1) { this.inBetweenPages.push(curretPage - 1); }
-    this.inBetweenPages.push(curretPage);
-    if (curretPage + 1 <= totalPages) { this.inBetweenPages.push(curretPage + 1); }
-    if (curretPage + 2 <= totalPages) { this.inBetweenPages.push(curretPage + 2); }
-    if (curretPage + 5 <= totalPages) { this.inBetweenPages.push(curretPage + 5); }
-    if (curretPage + 10 <= totalPages) { this.inBetweenPages.push(curretPage + 10); }
-  }
-
-  public nextPage() {
-    this.page.number = this.page.number + 1;
-    this.updateListViewAtPage();
-  }
-
-  public prevPage() {
-    this.page.number = this.page.number - 1;
-    this.updateListViewAtPage();
-  }
-
-  public firstPage() {
-    this.page.number = 0;
-    this.updateListViewAtPage();
-  }
-
-  public lastPage() {
-    this.page.number = this.page.totalPages - 1;
-    this.updateListViewAtPage();
-  }
-
-  public gotoPage(pageNumber: number) {
-    this.page.number = pageNumber;
-    this.updateListViewAtPage();
-  }
-
   public editarPerson(personId: number) {
     this.router.navigate([`person/${personId}`]);
   }
 
   public viewDetails(personId: number) {
     this.router.navigate([`details/${personId}`]);
-  }
-
-  private updateListViewAtPage() {
-    if (this.searchString !== '') {
-      this.search();
-    } else {
-      this.loadPeoplePaginatedFromDatabase();
-    }
   }
 
   public removerPerson(person: Person) {
@@ -130,12 +80,8 @@ export class HomeComponent implements OnInit {
   }
 
   public searchFromInputUser() {
-    this.resetPageToZero();
-    this.search();
-  }
-
-  private resetPageToZero() {
     this.page.number = 0;
+    this.search();
   }
 
   private search() {
@@ -145,16 +91,25 @@ export class HomeComponent implements OnInit {
     }
 
     this.api.getPersonByNameContaining(this.searchString, this.page)
-
     .subscribe(paginatedPeople => {
       this.setPaginatedDataIntoPeople(paginatedPeople);
-      this.configureInBetweenPages();
     });
   }
 
-  public changeMaxItemsPerPage(maxItemsPerPage: number) {
-    this.page.size = maxItemsPerPage;
-    this.searchFromInputUser();
+  private updateListViewAtPage() {
+    if (this.searchString !== '') {
+      this.search();
+    } else {
+      this.loadPeoplePaginatedFromDatabase();
+    }
   }
+
+  reciverFeedbackFromPagination(feedback) {
+    console.log('Foi emitido >>>> ', feedback);
+    this.page = feedback.page;
+    this.updateListViewAtPage();
+
+  }
+
 
 }

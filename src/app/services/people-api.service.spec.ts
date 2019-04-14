@@ -3,26 +3,24 @@ import { TestBed } from '@angular/core/testing';
 import { PeopleApiService } from './people-api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
+import { Observable, of } from 'rxjs';
 
 describe('PeopleApiService', () => {
+  let service: PeopleApiService;
+
   beforeEach(() => TestBed.configureTestingModule({
     imports: [HttpClientModule]
   }));
 
-
+  beforeEach(() => {
+    service = TestBed.get(PeopleApiService);
+  });
 
   it('should be created', () => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     expect(service).toBeTruthy();
   });
 
   it('should get a paginated list of people', (done) => {
-
-
-
-
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
-
     const page: Page = {
       content: null,
       last: false,
@@ -34,6 +32,24 @@ describe('PeopleApiService', () => {
       first: false,
       empty: false
     };
+
+    const expected = {
+      body: {
+        size: 5,
+        number: 2
+      },
+      status: 200,
+    };
+
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(expected);
+        console.log('am done');
+        observer.complete();
+      }, 2000);
+    });
+
+    spyOn(service, 'getPeople').and.returnValue(observable);
 
     service.getPeople(page).subscribe(data => {
       expect(data.status).toBe(200);
@@ -45,9 +61,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a ist of contatos', (done) => {
-
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
-
     const page: Page = {
       content: null,
       last: false,
@@ -60,6 +73,19 @@ describe('PeopleApiService', () => {
       empty: false
     };
 
+    const expected = {
+      status: 200,
+    };
+
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(expected);
+        console.log('am done');
+        observer.complete();
+      }, 2000);
+    });
+
+    spyOn(service, 'getContatos').and.returnValue(observable);
     service.getContatos(page).subscribe(data => {
       expect(data.status).toBe(200);
       done();
@@ -68,8 +94,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a paginated list of contatos by personId', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
-
     service.getContatoByPersonId(1).subscribe(data => {
       expect(data.status).toBe(200);
       done();
@@ -78,7 +102,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a person by id', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     service.getPersonById(1)
     .subscribe(data => {
       expect(data.status).toBe(200);
@@ -89,7 +112,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a contato by id', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     service.getContatoById(51)
     .subscribe(data => {
       expect(data.status).toBe(200);
@@ -100,7 +122,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a person by name containing string', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const nameToSearch = '1';
     const page: Page = {
       content: null,
@@ -125,7 +146,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should get a contato by name containing string', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const nameToSearch = '1';
     service.getContatoByNameContaining(nameToSearch)
     .subscribe(data => {
@@ -139,7 +159,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist a person', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const person: Person = {
       name: 'Beatiful Name',
       rg: '10101010101',
@@ -160,7 +179,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist a contato', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const relatedPerson: Person = {
       name: 'Beatiful Person Name',
       rg: '10101010101',
@@ -184,7 +202,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist one person and his 3 contatos', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const relatedPerson: Person = {
       name: 'Person should create and persist one person and his 3 contatos',
       rg: '10101010101',
@@ -222,7 +239,6 @@ describe('PeopleApiService', () => {
 
 
   it('should create, persist and update a person', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const person: Person = {
       name: 'Beatiful Name',
       rg: '10101010101',
@@ -252,7 +268,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create, persist and update a contato', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const relatedPerson: Person = {
       name: 'Beatiful Person Name',
       rg: '10101010101',
@@ -286,7 +301,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and delete a persistent person', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const person: Person = {
       name: 'Beatiful Name',
       rg: '10101010101',
@@ -313,7 +327,6 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and delete a persistent contato', (done) => {
-    const service: PeopleApiService = TestBed.get(PeopleApiService);
     const relatedPerson: Person = {
       name: 'Beatiful Person Name',
       rg: '10101010101',

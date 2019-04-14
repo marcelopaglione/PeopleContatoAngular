@@ -8,6 +8,7 @@ import { AlertComponent } from '../alert/alert.component';
 import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
+import { PaginationComponent } from '../pagination/pagination.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -22,7 +23,7 @@ describe('HomeComponent', () => {
         RouterModule,
         RouterTestingModule
       ],
-      declarations: [ HomeComponent, TitleComponent, AlertComponent  ]
+      declarations: [ HomeComponent, TitleComponent, AlertComponent, PaginationComponent ]
     })
     .compileComponents();
   }));

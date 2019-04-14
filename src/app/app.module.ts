@@ -12,6 +12,7 @@ import { HomeComponent } from './components/home/home.component';
 import { NewContatoComponent } from './components/contato/new-contato.component';
 import { ManagerPersonComponent } from './components/person/manage/manage-person.component';
 import { ViewPersonComponent } from './components/person/view/view-person.component';
+import { PaginationComponent } from './components/pagination/pagination.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { ViewPersonComponent } from './components/person/view/view-person.compon
     AlertComponent,
     HomeComponent,
     ViewPersonComponent,
+    PaginationComponent,
   ],
   imports: [
     BrowserModule,
