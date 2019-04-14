@@ -102,7 +102,7 @@ export class PeopleApiService {
 
   public saveContato(contato: Contato): Observable<HttpResponse<any>> {
     if (contato.id && contato.id !== 0) {
-      return this.http.put<any>(`${this.API}contatos`, contato, {
+      return this.http.put<any>(`${this.API}contatos/`, contato, {
         headers: this.getHeaders(),
         observe: 'response'
       });
