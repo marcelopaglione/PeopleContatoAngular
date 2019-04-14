@@ -41,20 +41,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  private resetPagination() {
-    this.page = {
-      content: [],
-      first: true,
-      last: false,
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-      size: 10,
-      numberOfElements: 0,
-      empty: true
-    };
-  }
-
   private setPaginatedDataIntoPeople(paginatedPeople: any) {
     this.people = paginatedPeople.body.content;
     this.page.first = paginatedPeople.body.first;
