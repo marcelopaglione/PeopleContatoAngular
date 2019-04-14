@@ -34,13 +34,15 @@ export class HomeComponent implements OnInit {
     this.loadPeoplePaginatedFromDatabase();
   }
 
-  public loadPeoplePaginatedFromDatabase() {
-    this.api.getPeople(this.page).subscribe(paginatedPeople => {
+  apiLoadPeoplePaginatedFromDatabase() { return this.api.getPeople(this.page); }
+  loadPeoplePaginatedFromDatabase() {
+    this.apiLoadPeoplePaginatedFromDatabase()
+    .subscribe(paginatedPeople => {
       this.setPaginatedDataIntoPeople(paginatedPeople);
     });
   }
 
-  private setPaginatedDataIntoPeople(paginatedPeople: any) {
+  setPaginatedDataIntoPeople(paginatedPeople: any) {
     this.people = paginatedPeople.body.content;
     this.page.first = paginatedPeople.body.first;
     this.page.last = paginatedPeople.body.last;
@@ -52,41 +54,39 @@ export class HomeComponent implements OnInit {
     this.page.empty = paginatedPeople.body.empty;
   }
 
-  public editarPerson(personId: number) {
+  editarPerson(personId: number) {
     this.router.navigate([`person/${personId}`]);
   }
 
-  public viewDetails(personId: number) {
+  viewDetails(personId: number) {
     this.router.navigate([`details/${personId}`]);
   }
 
-  public removerPerson(person: Person) {
-    if (!confirm(`Você ter certeza que deseja remover ${person.name}`)) {
-      return;
+  apiRemovePerson(id) {return this.api.deletePersonById(id);}
+  removerPerson(person: Person) {
+    if (confirm(`Você ter certeza que deseja remover ${person.name}`)) {
+      this.apiRemovePerson(person.id).subscribe(data => {
+        data.status === 200 ?
+          this.loadPeoplePaginatedFromDatabase() :
+          console.log(`Houve um erro ao deletar person ${person}`);
+      });
     }
-    this.api.deletePersonById(person.id).subscribe(data => {
-      if (data.status === 200) {
-        this.loadPeoplePaginatedFromDatabase();
-      } else {
-        console.log(`Houve um erro ao deletar person ${person}`);
-      }
-    });
   }
 
-  public keyDownFunction(event) {
+  keyDownFunction(event) {
     if (event.keyCode === 13) {
       this.searchFromInputUser();
     }
   }
 
-  public searchFromInputUser() {
+  searchFromInputUser() {
     this.page.number = 0;
     this.search();
   }
 
-  public apiGetPersonByNameContaining() { return this.api.getPersonByNameContaining(this.searchString, this.page); }
+  apiGetPersonByNameContaining() { return this.api.getPersonByNameContaining(this.searchString, this.page); }
 
-  public search() {
+  search() {
     if (this.searchString === '') {
       this.loadPeoplePaginatedFromDatabase();
       return;
@@ -98,7 +98,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  public updateListViewAtPage() {
+  updateListViewAtPage() {
     if (this.searchString !== '') {
       this.search();
     } else {

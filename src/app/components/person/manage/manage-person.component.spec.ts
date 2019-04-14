@@ -11,7 +11,8 @@ import { Person, Contato } from 'src/app/Entities';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { NewContatoComponent } from '../../contato/new-contato.component';
 import { Observable } from 'rxjs';
-
+import { doesNotThrow } from 'assert';
+import { ViewContainerRef } from '@angular/core';
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
   let service: PeopleApiService;
@@ -252,13 +253,61 @@ describe('ManagerPersonComponent', () => {
       setTimeout(() => {
         observer.next(expected);
         observer.complete();
-      }, 200);
+      }, 10);
     });
     spyOn(component, 'apiLoadPersonFromDatabase').and.returnValue(observable);
     spyOn(component, 'loadPerson').and.callThrough();
     spyOn(component, 'loadContatos').and.returnValue(false);
     component.idFromUrlParam = 1;
     component.loadPerson();
+
+  }));
+
+
+  it('should load contatos from the database', ((done) => {
+
+    const expected = {
+      body: [{id: '1', name: 'ABS', person: null}]
+    };
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(expected);
+        observer.complete();
+      }, 10);
+    });
+    const spe = spyOn(component, 'apiLoadContatosGetContatoByPersonId').and.returnValue(observable);
+    spyOn(component, 'loadContatos').and.callThrough();
+    spyOn(component, 'createComponent').and.callFake(() => {
+      expect(spe).toHaveBeenCalled();
+      done();
+    });
+
+    component.idFromUrlParam = 1;
+    component.loadContatos();
+
+  }));
+
+  it('should persist a Person on the database', (() => {
+
+    component.savePerson();
+    expect(component.fg.valid).toBeFalsy();
+
+    const personToSave = {id: null, name: 'Person Name', birthDate: '10/10/2015', rg: '15151515'};
+    component.fg.patchValue(personToSave);
+
+    const expected = {
+      body: {status: 200, person: personToSave}
+    };
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(expected);
+        observer.complete();
+      }, 10);
+    });
+    const spe = spyOn(component, 'apiSavePerson').and.returnValue(observable);
+    spyOn(component, 'savePerson').and.callThrough();
+    component.savePerson();
+    expect(spe).toHaveBeenCalled();
 
   }));
 

@@ -24,20 +24,19 @@ export class ViewPersonComponent implements OnInit {
     this.loadPersonAndItsContatos();
   }
 
+  apiLoadPersonAndItsContatos() { return this.api.getPersonById(this.idFromUrlParam); }
   loadPersonAndItsContatos() {
-    this.api.getPersonById(this.idFromUrlParam)
+    this.apiLoadPersonAndItsContatos()
     .subscribe(person => {
       this.person = person.body;
       this.loadContatos(person.body.id);
     });
   }
 
-  private contatoByPersonId(id) {
-    return this.api.getContatoByPersonId(id);
-  }
+  apiContatoByPersonId(id) { return this.api.getContatoByPersonId(id); }
 
   loadContatos(id: number) {
-    this.contatoByPersonId(id).toPromise()
+    this.apiContatoByPersonId(id).toPromise()
     .then(contatos => {
       this.setContatos(contatos.body);
     });

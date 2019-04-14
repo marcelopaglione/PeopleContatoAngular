@@ -10,8 +10,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { PeopleApiService } from 'src/app/services/people-api.service';
-import { Contato } from 'src/app/Entities';
+import { Contato, PersonContatoEntity } from 'src/app/Entities';
 import { Observable } from 'rxjs';
+import { doesNotThrow } from 'assert';
 
 describe('ViewPersonComponent', () => {
   let component: ViewPersonComponent;
@@ -64,9 +65,8 @@ describe('ViewPersonComponent', () => {
     const observable = Observable.create(observer => {
       setTimeout(() => {
         observer.next(contato1);
-        console.log('am done');
         observer.complete();
-      }, 1000);
+      }, 10);
     });
 
     const spyloadContatos = spyOn(component, 'loadContatos').and.returnValue(observable);
@@ -80,5 +80,42 @@ describe('ViewPersonComponent', () => {
     expect(component.contatos.length).toBeGreaterThan(0);
   }));
 
+  it('should to load loadPersonAndItsContatos from the database', ((done) => {
+    const expected = { body: {id: 124, name: 'Name', birthDate: '01/01/1900', rg: '125153'} };
 
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next({body: expected});
+        observer.complete();
+      }, 10);
+    });
+
+    const spyloadContatos = spyOn(component, 'apiLoadPersonAndItsContatos').and.returnValue(observable);
+    spyOn(component, 'ngOnInit').and.callThrough();
+    spyOn(component, 'loadContatos').and.callFake(() => {done(); });
+
+    component.idFromUrlParam = 124;
+    component.ngOnInit();
+    expect(spyloadContatos).toHaveBeenCalled();
+
+  }));
+
+  it('should to load loadContatos from the database', (() => {
+    const expected = { body: {id: 124, name: 'Name', person: null} };
+
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next({body: expected});
+        observer.complete();
+      }, 10);
+    });
+
+    const spyloadContatos = spyOn(component, 'apiContatoByPersonId').and.returnValue(observable);
+    // spyOn(component, 'ngOnInit').and.callThrough();
+    spyOn(component, 'loadContatos').and.callThrough();
+
+    component.loadContatos(142);
+    expect(spyloadContatos).toHaveBeenCalled();
+
+  }));
 });

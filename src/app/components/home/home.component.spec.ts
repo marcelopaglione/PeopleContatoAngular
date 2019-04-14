@@ -10,6 +10,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { Observable } from 'rxjs';
+import { Page } from 'src/app/Entities';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -69,7 +70,25 @@ describe('HomeComponent', () => {
   }));
 
   it('should perform a search', (() => {
-    const spy = spyOn(component, 'loadPeoplePaginatedFromDatabase').and.returnValue(true);
+    const expected: Page = {
+      content: [],
+      first: true,
+      last: false,
+      totalElements: 0,
+      totalPages: 0,
+      number: 0,
+      size: 10,
+      numberOfElements: 0,
+      empty: true
+    };
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next({body: expected});
+        observer.complete();
+      }, 10);
+    });
+
+    const spy = spyOn(component, 'apiLoadPeoplePaginatedFromDatabase').and.returnValue(observable);
     spyOn(component, 'search').and.callThrough();
     component.searchString = '';
     component.search();
@@ -92,13 +111,17 @@ describe('HomeComponent', () => {
     expect(spy).toHaveBeenCalled();
   }));
 
-  it('should receive feedback from the pagination component and update list view', (() => {
+  it('should receive feedback from the pagination component and update list view with empty search and user search', (() => {
 
-    component.searchString = '';
+    component.searchString = 'ASC';
     const spy = spyOn(component, 'updateListViewAtPage').and.callThrough();
     spyOn(component, 'reciverFeedbackFromPagination').and.callThrough();
     spyOn(component, 'loadPeoplePaginatedFromDatabase').and.returnValue(false);
 
+    component.reciverFeedbackFromPagination({event: 'changeMaxItemsPerPage', page: component.page});
+    expect(spy).toHaveBeenCalled();
+
+    component.searchString = '';
     component.reciverFeedbackFromPagination({event: 'changeMaxItemsPerPage', page: component.page});
     expect(spy).toHaveBeenCalled();
 
