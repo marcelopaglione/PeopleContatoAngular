@@ -1,40 +1,57 @@
 <app-title title="Detalhes"></app-title>
 
-<form *ngIf="person">
-  <ng-container
-    *ngTemplateOutlet="input; context: { label: 'ID:', value: person.id }"
-  ></ng-container>
+<div *ngIf="(allData$ | async) as person">
+  {{ person.name }}
+</div>
 
-  <ng-container
-    *ngTemplateOutlet="input; context: { label: 'Name:', value: person.name }"
-  ></ng-container>
-
-  <ng-container
-    *ngTemplateOutlet="input; context: { label: 'RG:', value: person.rg }"
-  ></ng-container>
-
-  <ng-container
-    *ngTemplateOutlet="
-      input;
-      context: {
-        label: 'Data de Nascimento:',
-        value: person.birthDate | date: 'dd/MMM/yyyy'
-      }
-    "
-  ></ng-container>
-
-  <div *ngFor="let item of contatos; let i = index">
+<div *ngIf="(allData$ | async) as personContatos; else loading">
+  <form>
     <ng-container
       *ngTemplateOutlet="
         input;
-        context: { label: 'Contato ' + (i + 1), value: item.name }
+        context: { label: 'ID:', value: personContatos.person.id }
       "
     ></ng-container>
-  </div>
 
-  <button class="btn btn-info mr-3" (click)="editPerson()">Editar</button>
-  <button class="btn" (click)="navigateBack()">Voltar</button>
-</form>
+    <ng-container
+      *ngTemplateOutlet="
+        input;
+        context: { label: 'Name:', value: personContatos.person.name }
+      "
+    ></ng-container>
+
+    <ng-container
+      *ngTemplateOutlet="
+        input;
+        context: { label: 'RG:', value: personContatos.person.rg }
+      "
+    ></ng-container>
+
+    <ng-container
+      *ngTemplateOutlet="
+        input;
+        context: {
+          label: 'Data de Nascimento:',
+          value: personContatos.person.birthDate | date: 'dd/MMM/yyyy'
+        }
+      "
+    ></ng-container>
+
+    <div *ngFor="let item of personContatos.contatos; let i = index">
+      <ng-container
+        *ngTemplateOutlet="
+          input;
+          context: { label: 'Contato ' + (i + 1), value: item.name }
+        "
+      ></ng-container>
+    </div>
+
+    <button class="btn btn-info mr-3" (click)="editPerson()">Editar</button>
+    <button class="btn" (click)="navigateBack()">Voltar</button>
+  </form>
+</div>
+
+<ng-template #loading>Carregando...</ng-template>
 
 <ng-template #input let-label="label" let-value="value">
   <div class="form-group row">

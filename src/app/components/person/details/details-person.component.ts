@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Person, Contato } from 'src/app/Entities';
+import { Person, Contato, PersonContatoEntity } from 'src/app/Entities';
 import { PeopleApiService } from 'src/app/services/people-api.service';
+import { map } from 'rxjs/operators';
+import { combineLatest, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-view-person',
@@ -10,47 +12,41 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 })
 export class DetailsPersonComponent implements OnInit {
   idFromUrlParam = 0;
-  person: Person = { id: 0, rg: '', name: '', birthDate: null };
-  contatos: Contato[] = [];
 
   constructor(
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private router: Router,
     private api: PeopleApiService
   ) {
-    this.route.params.subscribe(params => {
+    this.activatedRoute.params.subscribe(params => {
       this.idFromUrlParam = params.id;
     });
   }
 
+  allData$: Observable<PersonContatoEntity>;
+
   ngOnInit() {
-    this.loadPersonAndItsContatos();
+    this.allData$ = this.personContatos();
   }
 
-  apiLoadPersonAndItsContatos() {
-    return this.api.getPersonById(this.idFromUrlParam);
-  }
-  loadPersonAndItsContatos() {
-    this.apiLoadPersonAndItsContatos().subscribe(person => {
-      this.person = person.body;
-      this.loadContatos(person.body.id);
-    });
+  personContatos(): Observable<PersonContatoEntity> {
+    return combineLatest(this.person(), this.contatos()).pipe(
+      map(([p, c]) => {
+        return { person: p, contatos: c };
+      })
+    );
   }
 
-  apiContatoByPersonId(id) {
-    return this.api.getContatoByPersonId(id);
+  private person(): Observable<Person> {
+    return this.api
+      .getPersonById(this.idFromUrlParam)
+      .pipe(map(data => data.body));
   }
 
-  loadContatos(id: number) {
-    this.apiContatoByPersonId(id)
-      .toPromise()
-      .then(contatos => {
-        this.setContatos(contatos.body);
-      });
-  }
-
-  setContatos(contatos: Contato[]) {
-    this.contatos = contatos;
+  private contatos(): Observable<Contato[]> {
+    return this.api
+      .getContatoByPersonId(this.idFromUrlParam)
+      .pipe(map(data => data.body));
   }
 
   navigateBack() {
@@ -58,6 +54,6 @@ export class DetailsPersonComponent implements OnInit {
   }
 
   editPerson() {
-    this.router.navigate([`person/${this.person.id}`]);
+    this.router.navigate([`person/${this.idFromUrlParam}`]);
   }
 }
