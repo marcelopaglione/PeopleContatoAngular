@@ -26,9 +26,13 @@ describe('HomeComponent', () => {
         RouterModule,
         RouterTestingModule
       ],
-      declarations: [ HomeComponent, TitleComponent, AlertComponent, PaginationComponent ]
-    })
-    .compileComponents();
+      declarations: [
+        HomeComponent,
+        TitleComponent,
+        AlertComponent,
+        PaginationComponent
+      ]
+    }).compileComponents();
     router = TestBed.get(Router);
   }));
 
@@ -41,35 +45,35 @@ describe('HomeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be able to edit person', (() => {
+  it('should be able to edit person', () => {
     const navigateSpy = spyOn(router, 'navigate');
     component.editarPerson(1);
     expect(navigateSpy).toHaveBeenCalledWith(['person/1']);
-  }));
+  });
 
-  it('should be able to view details of person', (() => {
+  it('should be able to view details of person', () => {
     const navigateSpy = spyOn(router, 'navigate');
     component.viewDetails(1);
     expect(navigateSpy).toHaveBeenCalledWith(['details/1']);
-  }));
+  });
 
-  it('should be able to search for person by input string after enter key enter', (() => {
+  it('should be able to search for person by input string after enter key enter', () => {
     const spy = spyOn(component, 'searchFromInputUser').and.returnValue(true);
     spyOn(component, 'keyDownFunction').and.callThrough();
-    component.keyDownFunction({keyCode : 13});
+    component.keyDownFunction({ keyCode: 13 });
     expect(spy).toHaveBeenCalled();
-  }));
+  });
 
-  it('should reset page number before search', (() => {
+  it('should reset page number before search', () => {
     const spy = spyOn(component, 'search').and.returnValue(true);
     spyOn(component, 'searchFromInputUser').and.callThrough();
     component.page.number = 10;
     component.searchFromInputUser();
     expect(component.page.number).toBe(0);
     expect(spy).toHaveBeenCalled();
-  }));
+  });
 
-  it('should perform a search', (() => {
+  it('should perform a search', () => {
     const expected: Page = {
       content: [],
       first: true,
@@ -83,48 +87,56 @@ describe('HomeComponent', () => {
     };
     const observable = Observable.create(observer => {
       setTimeout(() => {
-        observer.next({body: expected});
+        observer.next({ body: expected });
         observer.complete();
       }, 10);
     });
 
-    const spy = spyOn(component, 'apiLoadPeoplePaginatedFromDatabase').and.returnValue(observable);
+    const spy = spyOn(
+      component,
+      'apiLoadPeoplePaginatedFromDatabase'
+    ).and.returnValue(observable);
     spyOn(component, 'search').and.callThrough();
     component.searchString = '';
     component.search();
     expect(spy).toHaveBeenCalled();
-  }));
+  });
 
-  it('should perform a search with input valur from the user', (() => {
-
+  it('should perform a search with input valur from the user', () => {
     const observable = Observable.create(observer => {
       setTimeout(() => {
-        observer.next({body: component.page});
+        observer.next({ body: component.page });
         observer.complete();
       }, 1000);
     });
-    const spy = spyOn(component, 'apiGetPersonByNameContaining').and.returnValue(observable);
+    const spy = spyOn(
+      component,
+      'apiGetPersonByNameContaining'
+    ).and.returnValue(observable);
 
     spyOn(component, 'search').and.callThrough();
     component.searchString = 'ABC';
     component.search();
     expect(spy).toHaveBeenCalled();
-  }));
+  });
 
-  it('should receive feedback from the pagination component and update list view with empty search and user search', (() => {
-
+  it('should receive feedback from the pagination component and update list view with empty search and user search', () => {
     component.searchString = 'ASC';
     const spy = spyOn(component, 'updateListViewAtPage').and.callThrough();
     spyOn(component, 'reciverFeedbackFromPagination').and.callThrough();
     spyOn(component, 'loadPeoplePaginatedFromDatabase').and.returnValue(false);
 
-    component.reciverFeedbackFromPagination({event: 'changeMaxItemsPerPage', page: component.page});
+    component.reciverFeedbackFromPagination({
+      event: 'changeMaxItemsPerPage',
+      page: component.page
+    });
     expect(spy).toHaveBeenCalled();
 
     component.searchString = '';
-    component.reciverFeedbackFromPagination({event: 'changeMaxItemsPerPage', page: component.page});
+    component.reciverFeedbackFromPagination({
+      event: 'changeMaxItemsPerPage',
+      page: component.page
+    });
     expect(spy).toHaveBeenCalled();
-
-  }));
-
+  });
 });

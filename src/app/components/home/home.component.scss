@@ -1,9 +1,10 @@
-a, .input-group-prepend {
+a,
+.input-group-prepend {
   cursor: pointer;
 }
 
 td i {
-  color: white
+  color: white;
 }
 
 .totalItemsPesquisados {
@@ -14,12 +15,11 @@ td i {
   display: flex;
   font-family: 'Montserrat';
   line-height: 40px;
-
 }
 
 .actions {
   color: black;
-  text-align: right
+  text-align: right;
 }
 
 .actionsOptions {
@@ -38,8 +38,9 @@ td i {
   border-color: #dee2e6;
 }
 
-
-.btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show>.btn-outline-secondary.dropdown-toggle {
+.btn-outline-secondary:not(:disabled):not(.disabled).active,
+.btn-outline-secondary:not(:disabled):not(.disabled):active,
+.show > .btn-outline-secondary.dropdown-toggle {
   color: black;
   background-color: #e9ecef;
   border-color: #dee2e6;

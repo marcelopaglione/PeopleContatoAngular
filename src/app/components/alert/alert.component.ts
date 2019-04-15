@@ -8,12 +8,9 @@ import { ReponseMessage } from 'src/app/Entities';
   styleUrls: ['./alert.component.scss']
 })
 export class AlertComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
+  @Input() reponseMessage: ReponseMessage = { message: '', status: '' };
 
-  @Input() reponseMessage: ReponseMessage = {message: '', status: ''};
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

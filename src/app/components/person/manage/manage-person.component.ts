@@ -60,7 +60,9 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   setApplicationTitle() {
-    isNull(this.fg.value.id) ? this.title = 'Cadastrar Nova Pessoa' : this.title = 'Editar Pessoa';
+    isNull(this.fg.value.id)
+      ? (this.title = 'Cadastrar Nova Pessoa')
+      : (this.title = 'Editar Pessoa');
   }
 
   initializePageData() {
@@ -70,7 +72,9 @@ export class ManagerPersonComponent implements OnInit {
     this.setApplicationTitle();
   }
 
-  apiLoadPersonFromDatabase() { return this.api.getPersonById(this.idFromUrlParam); }
+  apiLoadPersonFromDatabase() {
+    return this.api.getPersonById(this.idFromUrlParam);
+  }
   loadPerson() {
     if (this.idFromUrlParam) {
       this.apiLoadPersonFromDatabase()
@@ -87,7 +91,9 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-  apiLoadContatosGetContatoByPersonId() { return this.api.getContatoByPersonId(this.idFromUrlParam); }
+  apiLoadContatosGetContatoByPersonId() {
+    return this.api.getContatoByPersonId(this.idFromUrlParam);
+  }
   loadContatos() {
     if (this.idFromUrlParam) {
       this.apiLoadContatosGetContatoByPersonId()
@@ -120,7 +126,10 @@ export class ManagerPersonComponent implements OnInit {
     let contatIsInvalid = false;
     this.componentsReferences.map(contato => {
       if (!contato.instance.fg.value.name) {
-        this.setResponse({status: 'warning', message: 'Por favor informe o nome dos contatos'});
+        this.setResponse({
+          status: 'warning',
+          message: 'Por favor informe o nome dos contatos'
+        });
         contatIsInvalid = true;
         return;
       }
@@ -140,15 +149,18 @@ export class ManagerPersonComponent implements OnInit {
 
   isBirthDateInvalid() {
     if (!this.validateDate(this.fg.value.birthDate)) {
-      this.setResponse({status: 'warning', message: 'Data de nascimento está inválida'});
+      this.setResponse({
+        status: 'warning',
+        message: 'Data de nascimento está inválida'
+      });
       return true;
     }
     return false;
   }
 
   ifFormGroupInvalid() {
-    if (!this.fg.valid ) {
-      this.setResponse({status: 'warning', message: 'Formulário inválido'});
+    if (!this.fg.valid) {
+      this.setResponse({ status: 'warning', message: 'Formulário inválido' });
       return true;
     }
     return false;
@@ -175,13 +187,19 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   isValidFormToSubmit() {
-    if (this.ifFormGroupInvalid() || this.isBirthDateInvalid() || this.isContatosInvalid()) {
+    if (
+      this.ifFormGroupInvalid() ||
+      this.isBirthDateInvalid() ||
+      this.isContatosInvalid()
+    ) {
       return false;
     }
     return true;
   }
 
-  apiSavePerson(entityToPersist) {return this.api.savePersonAndContato(entityToPersist); }
+  apiSavePerson(entityToPersist) {
+    return this.api.savePersonAndContato(entityToPersist);
+  }
   savePerson() {
     if (!this.isValidFormToSubmit()) {
       return;
@@ -190,21 +208,32 @@ export class ManagerPersonComponent implements OnInit {
     const entityToPersist = this.createEntityToPersist();
     this.apiSavePerson(entityToPersist)
       .toPromise()
-      .then(data => {
-        if (data.status === 200 || data.status === 201) {
-          this.setResponse({status: 'success', message: `${ this.fg.value.name } foi salvo com sucesso!`});
-          this.initializePageData();
+      .then(
+        data => {
+          if (data.status === 200 || data.status === 201) {
+            this.setResponse({
+              status: 'success',
+              message: `${this.fg.value.name} foi salvo com sucesso!`
+            });
+            this.initializePageData();
+          }
+        },
+        err => {
+          err.status === 400
+            ? this.setResponse({
+                status: 'warning',
+                message:
+                  'Os valores informados estão inválidos, tente novamente!'
+              })
+            : this.setResponse({
+                status: 'danger',
+                message: err.error.message
+              });
         }
-      },
-      err => {
-        err.status === 400 ?
-        this.setResponse({status: 'warning', message: 'Os valores informados estão inválidos, tente novamente!'}) :
-        this.setResponse({status: 'danger', message: err.error.message});
-      }
-    );
+      );
   }
 
-  setResponse(event: {status: string; message: string}) {
+  setResponse(event: { status: string; message: string }) {
     this.response.message = event.message;
     this.response.status = event.status;
   }
@@ -213,7 +242,9 @@ export class ManagerPersonComponent implements OnInit {
     const componentFactory = this.CFR.resolveComponentFactory(
       NewContatoComponent
     );
-    const componentRef: ComponentRef<NewContatoComponent> = this.VCR.createComponent(componentFactory);
+    const componentRef: ComponentRef<
+      NewContatoComponent
+    > = this.VCR.createComponent(componentFactory);
     const currentComponent = componentRef.instance;
     currentComponent.selfRef = currentComponent;
     currentComponent.index = ++this.index;
@@ -233,7 +264,9 @@ export class ManagerPersonComponent implements OnInit {
     this.removeVisualComponent(componentRef, index);
   }
 
-  apiRemove(id) {return this.api.deleteContatoById(id); }
+  apiRemove(id) {
+    return this.api.deleteContatoById(id);
+  }
   remove(index: number) {
     if (this.VCR.length < 1) {
       return;
@@ -247,7 +280,13 @@ export class ManagerPersonComponent implements OnInit {
       return;
     }
 
-    if (!confirm(`Você ter certeza que deseja remover ${componentRef.instance.fg.value.name}`)) {
+    if (
+      !confirm(
+        `Você ter certeza que deseja remover ${
+          componentRef.instance.fg.value.name
+        }`
+      )
+    ) {
       return;
     }
 
@@ -256,9 +295,16 @@ export class ManagerPersonComponent implements OnInit {
       .then(data => {
         if (data.status === 200) {
           this.removeVisualComponent(componentRef, index);
-          this.setResponse({status: 'success', message: 'Contato Removido com sucesso'});
+          this.setResponse({
+            status: 'success',
+            message: 'Contato Removido com sucesso'
+          });
         } else {
-          this.setResponse({status: 'warning', message: 'Não foi possível remover contato, Por favor tente novamente mais tarde'});
+          this.setResponse({
+            status: 'warning',
+            message:
+              'Não foi possível remover contato, Por favor tente novamente mais tarde'
+          });
         }
       });
   }

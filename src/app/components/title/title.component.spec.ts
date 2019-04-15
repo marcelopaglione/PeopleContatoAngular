@@ -8,9 +8,8 @@ describe('TitleComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TitleComponent ]
-    })
-    .compileComponents();
+      declarations: [TitleComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -27,5 +26,4 @@ describe('TitleComponent', () => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toBeDefined();
   });
-
 });

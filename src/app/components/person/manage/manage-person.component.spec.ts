@@ -37,8 +37,7 @@ describe('ManagerPersonComponent', () => {
         AlertComponent,
         NewContatoComponent
       ]
-    })
-    .compileComponents();
+    }).compileComponents();
     router = TestBed.get(Router);
   }));
 
@@ -53,11 +52,15 @@ describe('ManagerPersonComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should hit on create a person and the formGroup should be valid', (done) => {
+  it('should hit on create a person and the formGroup should be valid', done => {
     inputElementName = fixture.nativeElement.querySelector('input[id=name]');
     inputElementRG = fixture.nativeElement.querySelector('input[id=rg]');
-    inputElementBirthDate = fixture.nativeElement.querySelector('input[id=birthDate]');
-    inputElementButtonSave = fixture.nativeElement.querySelector('button[id=save]');
+    inputElementBirthDate = fixture.nativeElement.querySelector(
+      'input[id=birthDate]'
+    );
+    inputElementButtonSave = fixture.nativeElement.querySelector(
+      'button[id=save]'
+    );
 
     const person: Person = {
       id: 0,
@@ -77,7 +80,6 @@ describe('ManagerPersonComponent', () => {
         done();
       });
     });
-
   });
 
   function sendInput(person: Person) {
@@ -106,56 +108,62 @@ describe('ManagerPersonComponent', () => {
     dateValidateResult = component.validateDate(date);
     expect(dateValidateResult).toBe(true);
 
-    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({ birthDate: date });
     let birthDateResultIsInvalid = component.isBirthDateInvalid();
     expect(birthDateResultIsInvalid).toBe(false);
 
     date = '2050/12/2050';
-    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({ birthDate: date });
     birthDateResultIsInvalid = component.isBirthDateInvalid();
     expect(birthDateResultIsInvalid).toBe(true);
 
     date = '31/01/2050';
-    component.fg.patchValue({birthDate: date});
+    component.fg.patchValue({ birthDate: date });
     component.formatDateFromUserInput();
-    expect(component.fg.value.birthDate.toString()).toContain('Mon Jan 31 2050');
+    expect(component.fg.value.birthDate.toString()).toContain(
+      'Mon Jan 31 2050'
+    );
 
     date = component.formatDate('2018-04-25T14:05:15.953Z');
     expect(date).toBe('25/04/2018');
-
-
   });
 
   it('set app title to Editar Pessoa and Cadastrar Nova Pessoa', () => {
-    component.fg.patchValue({id: null});
+    component.fg.patchValue({ id: null });
     component.setApplicationTitle();
     fixture.detectChanges();
     expect(component.title).toBe('Cadastrar Nova Pessoa');
-    component.fg.patchValue({id: 1});
+    component.fg.patchValue({ id: 1 });
     component.setApplicationTitle();
     fixture.detectChanges();
     expect(component.title).toBe('Editar Pessoa');
   });
 
-
-  it('should be able to navigate to `/home`', (() => {
+  it('should be able to navigate to `/home`', () => {
     const navigateSpy = spyOn(router, 'navigate');
     component.navigateBack();
     expect(navigateSpy).toHaveBeenCalledWith(['home']);
-  }));
+  });
 
-
-  it('should validate form before submit return true', (() => {
-
-    component.fg.patchValue({id: null});
+  it('should validate form before submit return true', () => {
+    component.fg.patchValue({ id: null });
     const date = '31/01/2050';
-    component.fg.patchValue({birthDate: date});
-    component.fg.patchValue({name: 'NameName'});
-    component.fg.patchValue({rg: '050505050'});
+    component.fg.patchValue({ birthDate: date });
+    component.fg.patchValue({ name: 'NameName' });
+    component.fg.patchValue({ rg: '050505050' });
 
-    const spyisValidFormToSubmit = spyOn(component, 'isValidFormToSubmit').and.callThrough();
-    const spyisBirthDateInvalid = spyOn(component, 'isBirthDateInvalid').and.callThrough();
-    const spyisContatosInvalid = spyOn(component, 'isContatosInvalid').and.callThrough();
+    const spyisValidFormToSubmit = spyOn(
+      component,
+      'isValidFormToSubmit'
+    ).and.callThrough();
+    const spyisBirthDateInvalid = spyOn(
+      component,
+      'isBirthDateInvalid'
+    ).and.callThrough();
+    const spyisContatosInvalid = spyOn(
+      component,
+      'isContatosInvalid'
+    ).and.callThrough();
 
     const response = component.isValidFormToSubmit();
 
@@ -164,18 +172,24 @@ describe('ManagerPersonComponent', () => {
     expect(spyisValidFormToSubmit).toHaveBeenCalled();
 
     expect(response).toBe(true);
+  });
 
-  }));
+  it('should validate form before submit return false', () => {
+    component.fg.patchValue({ id: null });
+    component.fg.patchValue({ name: 'NameName' });
 
-
-  it('should validate form before submit return false', (() => {
-
-    component.fg.patchValue({id: null});
-    component.fg.patchValue({name: 'NameName'});
-
-    const spyisValidFormToSubmit = spyOn(component, 'isValidFormToSubmit').and.callThrough();
-    const spyisBirthDateInvalid = spyOn(component, 'isBirthDateInvalid').and.callThrough();
-    const spyisContatosInvalid = spyOn(component, 'isContatosInvalid').and.callThrough();
+    const spyisValidFormToSubmit = spyOn(
+      component,
+      'isValidFormToSubmit'
+    ).and.callThrough();
+    const spyisBirthDateInvalid = spyOn(
+      component,
+      'isBirthDateInvalid'
+    ).and.callThrough();
+    const spyisContatosInvalid = spyOn(
+      component,
+      'isContatosInvalid'
+    ).and.callThrough();
 
     const response = component.isValidFormToSubmit();
 
@@ -184,19 +198,19 @@ describe('ManagerPersonComponent', () => {
     expect(spyisValidFormToSubmit).toHaveBeenCalled();
 
     expect(response).toBe(false);
-  }));
+  });
 
-  it('should create a valid entity to persist', (() => {
+  it('should create a valid entity to persist', () => {
     const contato: Contato = {
       id: 1,
       name: 'contato',
       person: null
     };
-    component.fg.patchValue({id: null});
+    component.fg.patchValue({ id: null });
     const date = '31/01/2050';
-    component.fg.patchValue({birthDate: date});
-    component.fg.patchValue({name: 'NameName'});
-    component.fg.patchValue({rg: '050505050'});
+    component.fg.patchValue({ birthDate: date });
+    component.fg.patchValue({ name: 'NameName' });
+    component.fg.patchValue({ rg: '050505050' });
     const person = component.fg.value;
 
     spyOn(component, 'getContatos').and.returnValue([contato]);
@@ -204,50 +218,60 @@ describe('ManagerPersonComponent', () => {
     const entityToPersist = component.createEntityToPersist();
     expect(entityToPersist.person).toEqual(person);
     expect(entityToPersist.contatos).toEqual([contato]);
+  });
 
-  }));
-
-
-  it('should create return a valid list of contatos', (() => {
-    component.fg.patchValue({id: null});
+  it('should create return a valid list of contatos', () => {
+    component.fg.patchValue({ id: null });
     const date = '31/01/2050';
-    component.fg.patchValue({birthDate: date});
-    component.fg.patchValue({name: 'NameName'});
-    component.fg.patchValue({rg: '050505050'});
+    component.fg.patchValue({ birthDate: date });
+    component.fg.patchValue({ name: 'NameName' });
+    component.fg.patchValue({ rg: '050505050' });
     const person = component.fg.value;
     const objectReference = {
-      instance: {fg: {value: {id: null, name: '', person: {id: null, name: '', birthDate: null, rg: ''}}}}
+      instance: {
+        fg: {
+          value: {
+            id: null,
+            name: '',
+            person: { id: null, name: '', birthDate: null, rg: '' }
+          }
+        }
+      }
     };
     component.componentsReferences.push(objectReference);
 
     const contatosList = component.getContatos();
     expect(contatosList.length).toBeDefined();
+  });
 
-  }));
-
-  it('should isContatosInvalid return true', (() => {
-    component.fg.patchValue({id: null});
+  it('should isContatosInvalid return true', () => {
+    component.fg.patchValue({ id: null });
     const date = '31/01/2050';
-    component.fg.patchValue({birthDate: date});
-    component.fg.patchValue({name: ''});
-    component.fg.patchValue({rg: '050505050'});
+    component.fg.patchValue({ birthDate: date });
+    component.fg.patchValue({ name: '' });
+    component.fg.patchValue({ rg: '050505050' });
     const person = component.fg.value;
     const objectReference = {
-      instance: {fg: {value: {id: null, name: '', person: {id: null, name: '', birthDate: null, rg: ''}}}}
+      instance: {
+        fg: {
+          value: {
+            id: null,
+            name: '',
+            person: { id: null, name: '', birthDate: null, rg: '' }
+          }
+        }
+      }
     };
     component.componentsReferences.push(objectReference);
 
     const isContatosInvalidReponse = component.isContatosInvalid();
     expect(isContatosInvalidReponse).toBe(true);
+  });
 
-  }));
-
-
-  it('should load a person from the database', (() => {
-
+  it('should load a person from the database', () => {
     const expected = {
       body: { id: '1', name: 'ABS', birthDate: '10/12/2015', rg: '912931294' },
-      status: 200,
+      status: 200
     };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -260,14 +284,11 @@ describe('ManagerPersonComponent', () => {
     spyOn(component, 'loadContatos').and.returnValue(false);
     component.idFromUrlParam = 1;
     component.loadPerson();
+  });
 
-  }));
-
-
-  it('should load contatos from the database', ((done) => {
-
+  it('should load contatos from the database', done => {
     const expected = {
-      body: [{id: '1', name: 'ABS', person: null}]
+      body: [{ id: '1', name: 'ABS', person: null }]
     };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -275,7 +296,10 @@ describe('ManagerPersonComponent', () => {
         observer.complete();
       }, 10);
     });
-    const spe = spyOn(component, 'apiLoadContatosGetContatoByPersonId').and.returnValue(observable);
+    const spe = spyOn(
+      component,
+      'apiLoadContatosGetContatoByPersonId'
+    ).and.returnValue(observable);
     spyOn(component, 'loadContatos').and.callThrough();
     spyOn(component, 'createComponent').and.callFake(() => {
       expect(spe).toHaveBeenCalled();
@@ -284,19 +308,22 @@ describe('ManagerPersonComponent', () => {
 
     component.idFromUrlParam = 1;
     component.loadContatos();
+  });
 
-  }));
-
-  it('should persist a Person on the database', (() => {
-
+  it('should persist a Person on the database', () => {
     component.savePerson();
     expect(component.fg.valid).toBeFalsy();
 
-    const personToSave = {id: null, name: 'Person Name', birthDate: '10/10/2015', rg: '15151515'};
+    const personToSave = {
+      id: null,
+      name: 'Person Name',
+      birthDate: '10/10/2015',
+      rg: '15151515'
+    };
     component.fg.patchValue(personToSave);
 
     const expected = {
-      body: {status: 200, person: personToSave}
+      body: { status: 200, person: personToSave }
     };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -308,7 +335,5 @@ describe('ManagerPersonComponent', () => {
     spyOn(component, 'savePerson').and.callThrough();
     component.savePerson();
     expect(spe).toHaveBeenCalled();
-
-  }));
-
+  });
 });

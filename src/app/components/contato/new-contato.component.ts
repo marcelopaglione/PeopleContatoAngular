@@ -10,20 +10,20 @@ export interface ContatoInterface {
   styleUrls: ['./new-contato.component.scss']
 })
 export class NewContatoComponent {
-
-  constructor(private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder) {}
 
   fg: FormGroup = this.formBuilder.group({
     id: [null],
     name: [null, Validators.required],
-    person: [null],
+    person: [null]
   });
   public index: number;
   public selfRef: NewContatoComponent;
   public compInteraction: ContatoInterface;
 
   removeMe(index) {
-    if (this.compInteraction) { this.compInteraction.remove(index); }
+    if (this.compInteraction) {
+      this.compInteraction.remove(index);
+    }
   }
-
 }

@@ -9,37 +9,44 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
   styleUrls: ['./view-person.component.scss']
 })
 export class ViewPersonComponent implements OnInit {
-
   idFromUrlParam = 0;
-  person: Person = {id: 0, rg: '', name: '', birthDate: null};
+  person: Person = { id: 0, rg: '', name: '', birthDate: null };
   contatos: Contato[] = [];
-
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private api: PeopleApiService) { this.route.params.subscribe(params => { this.idFromUrlParam = params.id; });  }
+    private api: PeopleApiService
+  ) {
+    this.route.params.subscribe(params => {
+      this.idFromUrlParam = params.id;
+    });
+  }
 
   ngOnInit() {
     this.loadPersonAndItsContatos();
   }
 
-  apiLoadPersonAndItsContatos() { return this.api.getPersonById(this.idFromUrlParam); }
+  apiLoadPersonAndItsContatos() {
+    return this.api.getPersonById(this.idFromUrlParam);
+  }
   loadPersonAndItsContatos() {
-    this.apiLoadPersonAndItsContatos()
-    .subscribe(person => {
+    this.apiLoadPersonAndItsContatos().subscribe(person => {
       this.person = person.body;
       this.loadContatos(person.body.id);
     });
   }
 
-  apiContatoByPersonId(id) { return this.api.getContatoByPersonId(id); }
+  apiContatoByPersonId(id) {
+    return this.api.getContatoByPersonId(id);
+  }
 
   loadContatos(id: number) {
-    this.apiContatoByPersonId(id).toPromise()
-    .then(contatos => {
-      this.setContatos(contatos.body);
-    });
+    this.apiContatoByPersonId(id)
+      .toPromise()
+      .then(contatos => {
+        this.setContatos(contatos.body);
+      });
   }
 
   setContatos(contatos: Contato[]) {
@@ -53,5 +60,4 @@ export class ViewPersonComponent implements OnInit {
   editPerson() {
     this.router.navigate([`person/${this.person.id}`]);
   }
-
 }

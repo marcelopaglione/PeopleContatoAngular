@@ -8,9 +8,8 @@ describe('PaginationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PaginationComponent ]
-    })
-    .compileComponents();
+      declarations: [PaginationComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -42,7 +41,5 @@ describe('PaginationComponent', () => {
     component.searchString = '';
     component.changeMaxItemsPerPage(10);
     expect(component.page.size).toBe(10);
-
   });
-
 });

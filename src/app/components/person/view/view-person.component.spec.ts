@@ -1,8 +1,4 @@
-import {
-  async,
-  ComponentFixture,
-  TestBed,
-} from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ViewPersonComponent } from './view-person.component';
 import { TitleComponent } from '../../title/title.component';
@@ -22,11 +18,7 @@ describe('ViewPersonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        HttpClientModule,
-        RouterModule,
-      ],
+      imports: [RouterTestingModule, HttpClientModule, RouterModule],
       declarations: [ViewPersonComponent, TitleComponent]
     }).compileComponents();
     router = TestBed.get(Router);
@@ -42,20 +34,20 @@ describe('ViewPersonComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be able to navigate to `/home`', (() => {
+  it('should be able to navigate to `/home`', () => {
     const navigateSpy = spyOn(router, 'navigate');
     component.navigateBack();
     expect(navigateSpy).toHaveBeenCalledWith(['home']);
-  }));
+  });
 
-  it('should be able to navigate to `/person`', (() => {
+  it('should be able to navigate to `/person`', () => {
     const navigateSpy = spyOn(router, 'navigate');
     component.person.id = 1;
     component.editPerson();
     expect(navigateSpy).toHaveBeenCalledWith(['person/1']);
-  }));
+  });
 
-  it('should be able to load contatos from database', (() => {
+  it('should be able to load contatos from database', () => {
     const contato1: Contato = {
       id: 1,
       name: 'Contato Name',
@@ -69,7 +61,9 @@ describe('ViewPersonComponent', () => {
       }, 10);
     });
 
-    const spyloadContatos = spyOn(component, 'loadContatos').and.returnValue(observable);
+    const spyloadContatos = spyOn(component, 'loadContatos').and.returnValue(
+      observable
+    );
     const spysetContatos = spyOn(component, 'setContatos').and.callThrough();
 
     component.loadContatos(1);
@@ -78,44 +72,52 @@ describe('ViewPersonComponent', () => {
     expect(spysetContatos).toHaveBeenCalled();
 
     expect(component.contatos.length).toBeGreaterThan(0);
-  }));
+  });
 
-  it('should to load loadPersonAndItsContatos from the database', ((done) => {
-    const expected = { body: {id: 124, name: 'Name', birthDate: '01/01/1900', rg: '125153'} };
+  it('should to load loadPersonAndItsContatos from the database', done => {
+    const expected = {
+      body: { id: 124, name: 'Name', birthDate: '01/01/1900', rg: '125153' }
+    };
 
     const observable = Observable.create(observer => {
       setTimeout(() => {
-        observer.next({body: expected});
+        observer.next({ body: expected });
         observer.complete();
       }, 10);
     });
 
-    const spyloadContatos = spyOn(component, 'apiLoadPersonAndItsContatos').and.returnValue(observable);
+    const spyloadContatos = spyOn(
+      component,
+      'apiLoadPersonAndItsContatos'
+    ).and.returnValue(observable);
     spyOn(component, 'ngOnInit').and.callThrough();
-    spyOn(component, 'loadContatos').and.callFake(() => {done(); });
+    spyOn(component, 'loadContatos').and.callFake(() => {
+      done();
+    });
 
     component.idFromUrlParam = 124;
     component.ngOnInit();
     expect(spyloadContatos).toHaveBeenCalled();
+  });
 
-  }));
-
-  it('should to load loadContatos from the database', (() => {
-    const expected = { body: {id: 124, name: 'Name', person: null} };
+  it('should to load loadContatos from the database', () => {
+    const expected = { body: { id: 124, name: 'Name', person: null } };
 
     const observable = Observable.create(observer => {
       setTimeout(() => {
-        observer.next({body: expected});
+        observer.next({ body: expected });
         observer.complete();
       }, 10);
     });
 
-    const spyloadContatos = spyOn(component, 'apiContatoByPersonId').and.returnValue(observable);
+    const spyloadContatos = spyOn(
+      component,
+      'apiContatoByPersonId'
+    ).and.returnValue(observable);
     // spyOn(component, 'ngOnInit').and.callThrough();
     spyOn(component, 'loadContatos').and.callThrough();
 
     component.loadContatos(142);
     expect(spyloadContatos).toHaveBeenCalled();
-
-  }));
+  });
 });

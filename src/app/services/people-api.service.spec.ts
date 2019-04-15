@@ -11,21 +11,19 @@ import {
 } from '@angular/common/http/testing';
 import { environment } from 'src/environments/environment';
 
-
-
 describe('PeopleApiService', () => {
   let service: PeopleApiService;
   const page = {
-      content: [],
-      first: true,
-      last: false,
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-      size: 10,
-      numberOfElements: 0,
-      empty: true
-    };
+    content: [],
+    first: true,
+    last: false,
+    totalElements: 0,
+    totalPages: 0,
+    number: 0,
+    size: 10,
+    numberOfElements: 0,
+    empty: true
+  };
   const API = environment.API;
 
   beforeEach(() =>
@@ -46,7 +44,6 @@ describe('PeopleApiService', () => {
     inject(
       [PeopleApiService, HttpTestingController],
       (api: PeopleApiService, backend: HttpTestingController) => {
-
         const url = `${API}people?size=${page.size}&page=${page.number}`;
         const responseObject = { success: true, message: 'success' };
         let response = null;
@@ -72,7 +69,6 @@ describe('PeopleApiService', () => {
     inject(
       [PeopleApiService, HttpTestingController],
       (api: PeopleApiService, backend: HttpTestingController) => {
-
         const url = `${API}contatos?size=${page.size}&page=${page.number}`;
         const responseObject = { success: true, message: 'success' };
         let response = null;
@@ -158,8 +154,10 @@ describe('PeopleApiService', () => {
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}people/findByName/${name}?size=${page.size}&page=${page.number}`
+        const requestWrapper = backend.expectOne({
+          url: `${API}people/findByName/${name}?size=${page.size}&page=${
+            page.number
+          }`
         });
         requestWrapper.flush(responseObject);
         tick();
@@ -183,8 +181,8 @@ describe('PeopleApiService', () => {
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/findByName/${name}`
+        const requestWrapper = backend.expectOne({
+          url: `${API}contatos/findByName/${name}`
         });
         requestWrapper.flush(responseObject);
         tick();
@@ -208,8 +206,8 @@ describe('PeopleApiService', () => {
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/findByPersonId/${id}`
+        const requestWrapper = backend.expectOne({
+          url: `${API}contatos/findByPersonId/${id}`
         });
         requestWrapper.flush(responseObject);
         tick();
@@ -226,16 +224,14 @@ describe('PeopleApiService', () => {
       (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };
         let response = null;
-        const person: Person = {id: 0, name: '', birthDate: null, rg: '' };
+        const person: Person = { id: 0, name: '', birthDate: null, rg: '' };
         api.savePerson(person).subscribe(
           (receivedResponse: any) => {
             response = receivedResponse;
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}people/`
-        });
+        const requestWrapper = backend.expectOne({ url: `${API}people/` });
         requestWrapper.flush(responseObject);
         tick();
         expect(requestWrapper.request.method).toEqual('POST');
@@ -251,16 +247,14 @@ describe('PeopleApiService', () => {
       (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };
         let response = null;
-        const person: Person = {id: 12, name: '', birthDate: null, rg: '' };
+        const person: Person = { id: 12, name: '', birthDate: null, rg: '' };
         api.savePerson(person).subscribe(
           (receivedResponse: any) => {
             response = receivedResponse;
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}people/`
-        });
+        const requestWrapper = backend.expectOne({ url: `${API}people/` });
         requestWrapper.flush(responseObject);
         tick();
         expect(requestWrapper.request.method).toEqual('PUT');
@@ -276,16 +270,14 @@ describe('PeopleApiService', () => {
       (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };
         let response = null;
-        const contato: Contato = {id: 0, name: '', person: null };
+        const contato: Contato = { id: 0, name: '', person: null };
         api.saveContato(contato).subscribe(
           (receivedResponse: any) => {
             response = receivedResponse;
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/`
-        });
+        const requestWrapper = backend.expectOne({ url: `${API}contatos/` });
         requestWrapper.flush(responseObject);
         tick();
         expect(requestWrapper.request.method).toEqual('POST');
@@ -301,16 +293,14 @@ describe('PeopleApiService', () => {
       (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };
         let response = null;
-        const contato: Contato = {id: 15, name: '', person: null };
+        const contato: Contato = { id: 15, name: '', person: null };
         api.saveContato(contato).subscribe(
           (receivedResponse: any) => {
             response = receivedResponse;
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/`
-        });
+        const requestWrapper = backend.expectOne({ url: `${API}contatos/` });
         requestWrapper.flush(responseObject);
         tick();
         expect(requestWrapper.request.method).toEqual('PUT');
@@ -326,15 +316,18 @@ describe('PeopleApiService', () => {
       (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };
         let response = null;
-        const entity: PersonContatoEntity = {person : {id: 0, name: '', birthDate: null, rg: '' }, contatos: []};
+        const entity: PersonContatoEntity = {
+          person: { id: 0, name: '', birthDate: null, rg: '' },
+          contatos: []
+        };
         api.savePersonAndContato(entity).subscribe(
           (receivedResponse: any) => {
             response = receivedResponse;
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/savePersonAndContatos/`
+        const requestWrapper = backend.expectOne({
+          url: `${API}contatos/savePersonAndContatos/`
         });
         requestWrapper.flush(responseObject);
         tick();
@@ -351,15 +344,18 @@ describe('PeopleApiService', () => {
       (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };
         let response = null;
-        const entity: PersonContatoEntity = {person : {id: 15, name: '', birthDate: null, rg: '' }, contatos: []};
+        const entity: PersonContatoEntity = {
+          person: { id: 15, name: '', birthDate: null, rg: '' },
+          contatos: []
+        };
         api.savePersonAndContato(entity).subscribe(
           (receivedResponse: any) => {
             response = receivedResponse;
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/updatePersonAndContatos/`
+        const requestWrapper = backend.expectOne({
+          url: `${API}contatos/updatePersonAndContatos/`
         });
         requestWrapper.flush(responseObject);
         tick();
@@ -383,9 +379,7 @@ describe('PeopleApiService', () => {
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}people/${id}`
-        });
+        const requestWrapper = backend.expectOne({ url: `${API}people/${id}` });
         requestWrapper.flush(responseObject);
         tick();
         expect(requestWrapper.request.method).toEqual('DELETE');
@@ -408,8 +402,8 @@ describe('PeopleApiService', () => {
           },
           (error: any) => {}
         );
-        const requestWrapper = backend.expectOne({ url:
-          `${API}contatos/${id}`
+        const requestWrapper = backend.expectOne({
+          url: `${API}contatos/${id}`
         });
         requestWrapper.flush(responseObject);
         tick();
@@ -419,7 +413,6 @@ describe('PeopleApiService', () => {
       }
     )
   ));
-
 
   it('should get a paginated list of people', done => {
     const expected = { body: { size: 5, number: 2 }, status: 200 };
@@ -545,7 +538,12 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist a person', done => {
-    const person: Person = { name: 'Beatiful Name', rg: '10101010101', birthDate: new Date(), id: 1 };
+    const person: Person = {
+      name: 'Beatiful Name',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 1
+    };
     const expected = { body: person, status: 201 };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -566,8 +564,17 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist a contato', done => {
-    const relatedPerson: Person = { name: 'Beatiful Person Name', rg: '10101010101', birthDate: new Date(), id: 1 };
-    const contato: Contato = { name: 'Beatiful Contato Name', id: 1, person: relatedPerson };
+    const relatedPerson: Person = {
+      name: 'Beatiful Person Name',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 1
+    };
+    const contato: Contato = {
+      name: 'Beatiful Contato Name',
+      id: 1,
+      person: relatedPerson
+    };
     const expected = { body: contato, status: 201 };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -586,11 +593,31 @@ describe('PeopleApiService', () => {
   });
 
   it('should create and persist one person and his 3 contatos', done => {
-    const relatedPerson: Person = { name: 'Person Name 1', rg: '10101010101', birthDate: new Date(), id: 0 };
-    const contato1: Contato = { name: 'Contact 1', id: 0, person: relatedPerson };
-    const contato2: Contato = { name: 'Contact 2', id: 0, person: relatedPerson };
-    const contato3: Contato = { name: 'Contatc 3', id: 0, person: relatedPerson };
-    const saveEntity: PersonContatoEntity = { person: relatedPerson, contatos: [contato1, contato2, contato3] };
+    const relatedPerson: Person = {
+      name: 'Person Name 1',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 0
+    };
+    const contato1: Contato = {
+      name: 'Contact 1',
+      id: 0,
+      person: relatedPerson
+    };
+    const contato2: Contato = {
+      name: 'Contact 2',
+      id: 0,
+      person: relatedPerson
+    };
+    const contato3: Contato = {
+      name: 'Contatc 3',
+      id: 0,
+      person: relatedPerson
+    };
+    const saveEntity: PersonContatoEntity = {
+      person: relatedPerson,
+      contatos: [contato1, contato2, contato3]
+    };
     const expected = { body: saveEntity, status: 200 };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -607,7 +634,12 @@ describe('PeopleApiService', () => {
   });
 
   it('should to update a person', done => {
-    const person: Person = { name: 'Beatiful Name', rg: '10101010101', birthDate: new Date(), id: 1 };
+    const person: Person = {
+      name: 'Beatiful Name',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 1
+    };
     const expected = { body: person, status: 200 };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -626,8 +658,17 @@ describe('PeopleApiService', () => {
   });
 
   it('should update a contato', done => {
-    const relatedPerson: Person = { name: 'Beatiful Person Name', rg: '10101010101', birthDate: new Date(), id: 0 };
-    const contato: Contato = { name: 'Beatiful Contato Name', id: 0, person: relatedPerson };
+    const relatedPerson: Person = {
+      name: 'Beatiful Person Name',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 0
+    };
+    const contato: Contato = {
+      name: 'Beatiful Contato Name',
+      id: 0,
+      person: relatedPerson
+    };
     const expected = { body: contato, status: 200 };
     const observable = Observable.create(observer => {
       setTimeout(() => {
@@ -661,10 +702,24 @@ describe('PeopleApiService', () => {
   });
 
   it('should delete a persistent contato', done => {
-    const relatedPerson: Person = { name: 'Beatiful Person Name', rg: '10101010101', birthDate: new Date(), id: 0 };
-    const contato: Contato = { name: 'Beatiful Contato Name', id: 0, person: relatedPerson };
+    const relatedPerson: Person = {
+      name: 'Beatiful Person Name',
+      rg: '10101010101',
+      birthDate: new Date(),
+      id: 0
+    };
+    const contato: Contato = {
+      name: 'Beatiful Contato Name',
+      id: 0,
+      person: relatedPerson
+    };
     const expected = { body: contato, status: 200 };
-    const observable = Observable.create(observer => { setTimeout(() => { observer.next(expected); observer.complete(); }, 10); });
+    const observable = Observable.create(observer => {
+      setTimeout(() => {
+        observer.next(expected);
+        observer.complete();
+      }, 10);
+    });
     spyOn(service, 'deleteContatoById').and.returnValue(observable);
 
     service.deleteContatoById(contato.id).subscribe(updatedContato => {
@@ -673,7 +728,4 @@ describe('PeopleApiService', () => {
     });
     expect(service).toBeTruthy();
   });
-
-
 });
-

@@ -25,9 +25,13 @@ describe('HomeComponent', () => {
         RouterModule,
         RouterTestingModule
       ],
-      declarations: [ NewContatoComponent, TitleComponent, AlertComponent, PaginationComponent ]
-    })
-    .compileComponents();
+      declarations: [
+        NewContatoComponent,
+        TitleComponent,
+        AlertComponent,
+        PaginationComponent
+      ]
+    }).compileComponents();
     router = TestBed.get(Router);
   }));
 
@@ -46,6 +50,4 @@ describe('HomeComponent', () => {
     component.removeMe(1);
     expect(spy).toHaveBeenCalled();
   });
-
-
 });

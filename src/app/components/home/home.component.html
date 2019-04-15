@@ -1,65 +1,80 @@
 <app-title title="Gerenciar Pessoas"></app-title>
 <div class="d-flex justify-content-between">
-    <div >
-        <a class="btn btn-info mb-3" routerLink="/person">Nova Pessoa</a>
-    </div>
-    <div >
-      <div class="input-group">
-        <div class="input-group-prepend" (click)="searchFromInputUser()">
-          <span class="input-group-text" id="basic-addon1">
-            <a>
-              <i style="color: black" class="fas fa-search"></i>
-            </a>
-          </span>
-        </div>
-        <form (keydown)="keyDownFunction($event)">
-          <input type="text" [(ngModel)]="searchString" class="form-control" placeholder="Pesquisar por pessoas" name="Pesquisar">
-        </form>
+  <div>
+    <a class="btn btn-info mb-3" routerLink="/person">Nova Pessoa</a>
+  </div>
+  <div>
+    <div class="input-group">
+      <div class="input-group-prepend" (click)="searchFromInputUser()">
+        <span class="input-group-text" id="basic-addon1">
+          <a>
+            <i style="color: black" class="fas fa-search"></i>
+          </a>
+        </span>
       </div>
+      <form (keydown)="keyDownFunction($event)">
+        <input
+          type="text"
+          [(ngModel)]="searchString"
+          class="form-control"
+          placeholder="Pesquisar por pessoas"
+          name="Pesquisar"
+        />
+      </form>
     </div>
-
+  </div>
 </div>
-
 
 <div class="table-responsive">
-    <table class="table table-striped" *ngIf="page.content">
-        <thead>
-          <tr>
-            <th scope="col">id</th>
-            <th scope="col">Nome</th>
-            <th scope="col">RG</th>
-            <th scope="col">Data de Nascimento</th>
-            <th scope="col" class="actions"><i class="fas fa-cog"></i></th>
-          </tr>
-        </thead>
-        <tbody>
-          <td *ngIf="page.content.length === 0" class="emptyList">
-            Lista vazia
-          </td>
-          <tr *ngFor="let item of page.content">
-            <th scope="row">{{item.id}}</th>
-            <td>{{item.name}}</td>
-            <td>{{item.rg}}</td>
-            <td>{{item.birthDate | date: 'dd/MM/yyyy' }}</td>
-            <td class="actionsOptions">
-                <a class="btn btn-sm btn-warning mr-2" (click)="viewDetails(item.id)" title="Ver detalhes de {{item.name}}"><i class="fas fa-eye"></i></a>
-                <a class="btn btn-sm btn-info mr-2" (click)="editarPerson(item.id)" title="Editar {{item.name}}"><i class="fas fa-pencil-alt"></i></a>
-                <a class="btn btn-sm btn-danger" (click)="removerPerson(item)" title="Remover {{item.name}}"><i class="fas fa-trash"></i></a>
-
-            </td>
-          </tr>
-        </tbody>
-        <tfoot>
-
-        </tfoot>
-      </table>
+  <table class="table table-striped" *ngIf="page.content">
+    <thead>
+      <tr>
+        <th scope="col">id</th>
+        <th scope="col">Nome</th>
+        <th scope="col">RG</th>
+        <th scope="col">Data de Nascimento</th>
+        <th scope="col" class="actions"><i class="fas fa-cog"></i></th>
+      </tr>
+    </thead>
+    <tbody>
+      <td *ngIf="page.content.length === 0" class="emptyList">
+        Lista vazia
+      </td>
+      <tr *ngFor="let item of page.content">
+        <th scope="row">{{ item.id }}</th>
+        <td>{{ item.name }}</td>
+        <td>{{ item.rg }}</td>
+        <td>{{ item.birthDate | date: 'dd/MM/yyyy' }}</td>
+        <td class="actionsOptions">
+          <a
+            class="btn btn-sm btn-warning mr-2"
+            (click)="viewDetails(item.id)"
+            title="Ver detalhes de {{ item.name }}"
+            ><i class="fas fa-eye"></i
+          ></a>
+          <a
+            class="btn btn-sm btn-info mr-2"
+            (click)="editarPerson(item.id)"
+            title="Editar {{ item.name }}"
+            ><i class="fas fa-pencil-alt"></i
+          ></a>
+          <a
+            class="btn btn-sm btn-danger"
+            (click)="removerPerson(item)"
+            title="Remover {{ item.name }}"
+            ><i class="fas fa-trash"></i
+          ></a>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
 </div>
 
-
-  <div class="myPagination d-flex justify-content-between">
-      <app-pagination
-      [page]="page"
-      [searchString]="searchString"
-      (eventChangeMaxItemsPerPage)="reciverFeedbackFromPagination($event)"
-    ></app-pagination>
-    </div>
+<div class="myPagination d-flex justify-content-between">
+  <app-pagination
+    [page]="page"
+    [searchString]="searchString"
+    (eventChangeMaxItemsPerPage)="reciverFeedbackFromPagination($event)"
+  ></app-pagination>
+</div>

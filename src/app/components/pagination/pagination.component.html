@@ -1,46 +1,69 @@
-<div >
+<div>
   <nav aria-label="..." class="d-flex">
     <ul class="pagination justify-content-center pagination-sm">
-      <li class="page-item" [ngClass]="{'disabled': page.first}">
-        <a class="page-link" (click)="firstPage()" tabindex="-1" aria-disabled="true">First</a>
+      <li class="page-item" [ngClass]="{ disabled: page.first }">
+        <a
+          class="page-link"
+          (click)="firstPage()"
+          tabindex="-1"
+          aria-disabled="true"
+          >First</a
+        >
       </li>
-      <li class="page-item" [ngClass]="{'disabled': page.first}">
-        <a class="page-link" (click)="prevPage()" tabindex="-1" aria-disabled="true"><span aria-hidden="true">&laquo;</span></a>
+      <li class="page-item" [ngClass]="{ disabled: page.first }">
+        <a
+          class="page-link"
+          (click)="prevPage()"
+          tabindex="-1"
+          aria-disabled="true"
+          ><span aria-hidden="true">&laquo;</span></a
+        >
       </li>
 
-      <li *ngFor="let item of inBetweenPages" class="page-item" [ngClass]="{'active': (item - 1) === page.number}">
-        <a class="page-link" (click)="gotoPage(item-1)">{{item}}</a>
+      <li
+        *ngFor="let item of inBetweenPages"
+        class="page-item"
+        [ngClass]="{ active: item - 1 === page.number }"
+      >
+        <a class="page-link" (click)="gotoPage(item - 1)">{{ item }}</a>
       </li>
 
-      <li class="page-item" [ngClass]="{'disabled': page.last}">
-        <a class="page-link" (click)="nextPage()"><span aria-hidden="true">&raquo;</span></a>
+      <li class="page-item" [ngClass]="{ disabled: page.last }">
+        <a class="page-link" (click)="nextPage()"
+          ><span aria-hidden="true">&raquo;</span></a
+        >
       </li>
-      <li class="page-item" [ngClass]="{'disabled': page.last}">
+      <li class="page-item" [ngClass]="{ disabled: page.last }">
         <a class="page-link" (click)="lastPage()">Last</a>
       </li>
 
       <li class="page-item">
-          <div class="dropdown">
-              <a class="btn btn-sm dropdown-toggle btn-outline-secondary"
-                role="button" id="dropdownOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{page.size}}
-              </a>
+        <div class="dropdown">
+          <a
+            class="btn btn-sm dropdown-toggle btn-outline-secondary"
+            role="button"
+            id="dropdownOptions"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {{ page.size }}
+          </a>
 
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <a class="dropdown-item" (click)="changeMaxItemsPerPage(5)">5</a>
-                <a class="dropdown-item" (click)="changeMaxItemsPerPage(10)">10</a>
-                <a class="dropdown-item" (click)="changeMaxItemsPerPage(20)">20</a>
-                <a class="dropdown-item" (click)="changeMaxItemsPerPage(50)">50</a>
-              </div>
-            </div>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <a class="dropdown-item" (click)="changeMaxItemsPerPage(5)">5</a>
+            <a class="dropdown-item" (click)="changeMaxItemsPerPage(10)">10</a>
+            <a class="dropdown-item" (click)="changeMaxItemsPerPage(20)">20</a>
+            <a class="dropdown-item" (click)="changeMaxItemsPerPage(50)">50</a>
+          </div>
+        </div>
       </li>
     </ul>
   </nav>
-
 </div>
 
 <div>
   <div class="totalItemsPesquisados">
-    Total de itens mostrados: {{page.totalElements}}
+    Total de itens mostrados: {{ page.totalElements }}
   </div>
 </div>

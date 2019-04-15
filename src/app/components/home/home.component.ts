@@ -9,11 +9,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-
-  constructor(
-    private api: PeopleApiService,
-    private router: Router
-  ) {  }
+  constructor(private api: PeopleApiService, private router: Router) {}
 
   searchString = '';
   page: Page = {
@@ -32,10 +28,11 @@ export class HomeComponent implements OnInit {
     this.loadPeoplePaginatedFromDatabase();
   }
 
-  apiLoadPeoplePaginatedFromDatabase() { return this.api.getPeople(this.page); }
+  apiLoadPeoplePaginatedFromDatabase() {
+    return this.api.getPeople(this.page);
+  }
   loadPeoplePaginatedFromDatabase() {
-    this.apiLoadPeoplePaginatedFromDatabase()
-    .subscribe(paginatedPeople => {
+    this.apiLoadPeoplePaginatedFromDatabase().subscribe(paginatedPeople => {
       this.setPaginatedDataIntoPeople(paginatedPeople);
     });
   }
@@ -52,13 +49,15 @@ export class HomeComponent implements OnInit {
     this.router.navigate([`details/${personId}`]);
   }
 
-  apiRemovePerson(id) {return this.api.deletePersonById(id);}
+  apiRemovePerson(id) {
+    return this.api.deletePersonById(id);
+  }
   removerPerson(person: Person) {
     if (confirm(`Você ter certeza que deseja remover ${person.name}`)) {
       this.apiRemovePerson(person.id).subscribe(data => {
-        data.status === 200 ?
-          this.loadPeoplePaginatedFromDatabase() :
-          console.log(`Houve um erro ao deletar person ${person}`);
+        data.status === 200
+          ? this.loadPeoplePaginatedFromDatabase()
+          : console.log(`Houve um erro ao deletar person ${person}`);
       });
     }
   }
@@ -74,7 +73,9 @@ export class HomeComponent implements OnInit {
     this.search();
   }
 
-  apiGetPersonByNameContaining() { return this.api.getPersonByNameContaining(this.searchString, this.page); }
+  apiGetPersonByNameContaining() {
+    return this.api.getPersonByNameContaining(this.searchString, this.page);
+  }
 
   search() {
     if (this.searchString === '') {
@@ -82,10 +83,11 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    this.apiGetPersonByNameContaining().toPromise()
-    .then(paginatedPeople => {
-      this.setPaginatedDataIntoPeople(paginatedPeople);
-    });
+    this.apiGetPersonByNameContaining()
+      .toPromise()
+      .then(paginatedPeople => {
+        this.setPaginatedDataIntoPeople(paginatedPeople);
+      });
   }
 
   updateListViewAtPage() {
@@ -100,8 +102,5 @@ export class HomeComponent implements OnInit {
     console.log('Foi emitido >>>> ', feedback);
     this.page = feedback.page;
     this.updateListViewAtPage();
-
   }
-
-
 }
