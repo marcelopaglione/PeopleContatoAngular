@@ -5,10 +5,10 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 
 @Component({
   selector: 'app-view-person',
-  templateUrl: './view-person.component.html',
-  styleUrls: ['./view-person.component.scss']
+  templateUrl: './details-person.component.html',
+  styleUrls: ['./details-person.component.scss']
 })
-export class ViewPersonComponent implements OnInit {
+export class DetailsPersonComponent implements OnInit {
   idFromUrlParam = 0;
   person: Person = { id: 0, rg: '', name: '', birthDate: null };
   contatos: Contato[] = [];

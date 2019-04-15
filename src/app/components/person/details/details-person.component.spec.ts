@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ViewPersonComponent } from './view-person.component';
-import { TitleComponent } from '../../title/title.component';
+import { DetailsPersonComponent } from './details-person.component';
+import { TitleComponent } from '../../shared/title/title.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
@@ -10,22 +10,22 @@ import { Contato, PersonContatoEntity } from 'src/app/Entities';
 import { Observable } from 'rxjs';
 import { doesNotThrow } from 'assert';
 
-describe('ViewPersonComponent', () => {
-  let component: ViewPersonComponent;
-  let fixture: ComponentFixture<ViewPersonComponent>;
+describe('DetailsPersonComponent', () => {
+  let component: DetailsPersonComponent;
+  let fixture: ComponentFixture<DetailsPersonComponent>;
   let router: Router;
   let service: PeopleApiService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientModule, RouterModule],
-      declarations: [ViewPersonComponent, TitleComponent]
+      declarations: [DetailsPersonComponent, TitleComponent]
     }).compileComponents();
     router = TestBed.get(Router);
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ViewPersonComponent);
+    fixture = TestBed.createComponent(DetailsPersonComponent);
     service = TestBed.get(PeopleApiService);
     component = fixture.componentInstance;
   });
