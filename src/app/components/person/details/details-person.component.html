@@ -1,9 +1,5 @@
 <app-title title="Detalhes"></app-title>
 
-<div *ngIf="(allData$ | async) as person">
-  {{ person.name }}
-</div>
-
 <div *ngIf="(allData$ | async) as personContatos; else loading">
   <form>
     <ng-container
