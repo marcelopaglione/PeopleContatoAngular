@@ -153,6 +153,6 @@ describe('ManagerPersonComponent', () => {
     expect(component.contatos.length).toBe(1);
     component.removeContato(mockContato);
     expect(component.contatos.length).toBe(0);
-
   });
+
 });

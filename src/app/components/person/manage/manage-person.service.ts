@@ -3,6 +3,8 @@ import { Contato, ReponseMessage } from 'src/app/Entities';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { isNullOrUndefined } from 'util';
 import { FormGroup } from '@angular/forms';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +13,7 @@ export class ManagePersonService {
   contatos = [];
   response: ReponseMessage = { message: '', status: '' };
 
-  constructor(
-    private api: PeopleApiService
-  ) {}
+  constructor(private api: PeopleApiService) {}
 
   appAddContatoComponent(inputContato: Contato) {
     this.contatos.push(inputContato);
@@ -21,11 +21,7 @@ export class ManagePersonService {
 
   removeContato(contato: Contato) {
     if (contato.id !== 0) {
-      if (
-        !confirm(
-          `Você ter certeza que deseja remover ${contato.name}`
-        )
-      ) {
+      if (!this.dialogConfirmDeleteContaot(contato)) {
         return;
       }
       this.eventRemoveContatoFromDatabase(contato);
@@ -34,11 +30,19 @@ export class ManagePersonService {
     }
   }
 
-  private eventRemoveContatoFromDatabase(contato: Contato) {
-    this.api
-      .deleteContatoById(contato.id)
-      .toPromise()
-      .then(data => {
+  private dialogConfirmDeleteContaot(contato: Contato) {
+    if (!confirm(`Você tem certeza que deseja remover ${contato.name}`)) {
+      return true;
+    }
+    return false;
+  }
+
+  eventRemoveContatoFromDatabase(contato: Contato) {
+    this.removeContatoFromDatabase(contato).subscribe();
+  }
+  removeContatoFromDatabase(contato: Contato): Observable<any> {
+    return this.api.deleteContatoById(contato.id).pipe(
+      map(data => {
         if (data.status === 200) {
           this.eventRemoveVisualContatoComponent(contato);
           this.setResponse({
@@ -52,7 +56,8 @@ export class ManagePersonService {
               'Não foi possível remover contato, Por favor tente novamente mais tarde'
           });
         }
-      });
+      })
+    );
   }
 
   private eventRemoveVisualContatoComponent(contato: Contato) {
@@ -64,11 +69,6 @@ export class ManagePersonService {
   setResponse(event: { status: string; message: string }) {
     this.response.message = event.message;
     this.response.status = event.status;
-  }
-
-  toDate(dateStr): Date {
-    const [day, month, year] = dateStr.toString().split('/');
-    return new Date(year, month - 1, day);
   }
 
   formatDate(dateToFormt: string) {
@@ -85,9 +85,6 @@ export class ManagePersonService {
   }
 
   validateDate(date: string): boolean {
-    if (isNullOrUndefined(date)) {
-      return false;
-    }
     const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
     if (!dateRegex.test(date)) {
       return false;

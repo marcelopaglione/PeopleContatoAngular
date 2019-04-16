@@ -38,6 +38,11 @@ describe('HomeComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    jasmine.getEnv().addReporter({
+      specStarted(result) {
+        console.log(result.fullName);
+      }
+    });
   });
 
   it('should create', () => {

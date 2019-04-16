@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { PersonContatoEntity } from '../Entities';
 import { HttpResponse } from '@angular/common/http';
-import { isUndefined, isNull } from 'util';
+import { isUndefined, isNull, isNullOrUndefined } from 'util';
 
 export class MockPeopleApiService {
   authenticated = false;
@@ -11,7 +11,12 @@ export class MockPeopleApiService {
         {
           id: 1,
           name: 'Contato Name',
-          person: null
+          person: {
+            id: 1,
+            name: 'Person name',
+            rg: '101010',
+            birthDate: '31/01/1500'
+          }
         }
       ]
     });
@@ -22,9 +27,20 @@ export class MockPeopleApiService {
         id: 1,
         name: 'Person name',
         rg: '101010',
-        birthDate: null
+        birthDate: '31/01/1500'
       }
     });
+  }
+  public deleteContatoById(id: number): Observable<HttpResponse<any>> {
+    if (!isNullOrUndefined(id)) {
+      return of(new HttpResponse( {
+        status: 200
+      }));
+    } else {
+      return of(new HttpResponse( {
+        status: 404
+      }));
+    }
   }
   public savePersonAndContato(
     entity: PersonContatoEntity

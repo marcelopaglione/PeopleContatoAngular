@@ -53,7 +53,10 @@ export class ManagerPersonComponent implements OnInit, AfterContentInit {
   });
   person$ = this.api
     .getPersonById(this.idFromUrlParam)
-    .pipe(map(data => data.body));
+    .pipe(map(data => {
+      data.body.birthDate = this.service.formatDate(data.body.birthDate);
+      return data.body;
+    }));
   contatos$ = this.api
     .getContatoByPersonId(this.idFromUrlParam)
     .pipe(map(data => data.body));
