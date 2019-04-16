@@ -6,7 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { isNull } from 'util';
 import { ManagePersonService } from './manage-person.service';
 import { map } from 'rxjs/operators';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-manage-person',
@@ -48,7 +48,24 @@ export class ManagerPersonComponent implements OnInit {
     return this.service.contatosComponent;
   }
 
+  get contatos() {
+    return this.service.contatos;
+  }
+
   appAddContatoComponent() {
+    const internalForm = this.formBuilder.group({
+      id: [null],
+      name: [null, Validators.required],
+      person: [null]
+    });
+    internalForm.patchValue({name: 'asdasf'});
+    this.service.contatos.push([
+      {
+        fg: internalForm,
+        name: 'aaff'
+      }
+    ]);
+
     this.service.appAddContatoComponent();
   }
 
@@ -194,27 +211,31 @@ export class ManagerPersonComponent implements OnInit {
     };
   }
 
-  savePerson() {
+  save() {
+    this.service.contatos.map(form => console.log(form));
+
+    this.savePerson().subscribe();
+  }
+
+  savePerson(): Observable<any> {
     if (!this.isValidFormToSubmit()) {
-      return;
+      return of('');
     }
     this.formatDateFromUserInput();
     const entityToPersist = this.createEntityToPersist();
-    this.api
-      .savePersonAndContato(entityToPersist)
-      .toPromise()
-      .then(
-        data => {
-          if (data.status === 200 || data.status === 201) {
-            this.service.setResponse({ status: 'success', message: `${this.fg.value.name} foi salvo com sucesso!` });
-            this.initializePageData();
-          }
-        },
-        err => { err.status === 400 ?
-          this.service.setResponse({ status: 'warning', message: 'Os valores informados estão inválidos, tente novamente!'}) :
-          this.service.setResponse({ status: 'danger', message: err.error.message });
+    return this.api
+    .savePersonAndContato(entityToPersist).pipe(map(
+      data => {
+        if (data.status === 200 || data.status === 201) {
+          this.service.setResponse({ status: 'success', message: `${this.fg.value.name} foi salvo com sucesso!` });
+          this.initializePageData();
         }
-      );
+      },
+      err => { err.status === 400 ?
+        this.service.setResponse({ status: 'warning', message: 'Os valores informados estão inválidos, tente novamente!'}) :
+        this.service.setResponse({ status: 'danger', message: err.error.message });
+      }
+    ));
   }
 
   private toDate(dateStr): Date {

@@ -16,6 +16,7 @@ export class ManagePersonService {
   @ViewChild('contatoRef', { read: ViewContainerRef })
   entry: ViewContainerRef;
   contatosComponent = [];
+  contatos = [];
   response: ReponseMessage = { message: '', status: '' };
 
   constructor(

@@ -47,7 +47,7 @@ describe('HomeComponent', () => {
 
   it('should remove me', () => {
     const spy = spyOn(component, 'removeMe').and.callThrough();
-    component.removeMe(1);
+    component.removeMe();
     expect(spy).toHaveBeenCalled();
   });
 });

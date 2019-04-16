@@ -1,4 +1,7 @@
 import { Observable, of } from 'rxjs';
+import { PersonContatoEntity } from '../Entities';
+import { HttpResponse } from '@angular/common/http';
+import { isUndefined, isNull } from 'util';
 
 export class MockPeopleApiService {
   authenticated = false;
@@ -22,5 +25,26 @@ export class MockPeopleApiService {
         birthDate: null
       }
     });
+  }
+  public savePersonAndContato(
+    entity: PersonContatoEntity
+  ): Observable<HttpResponse<any>> {
+    if (
+      entity.person.id === 0 ||
+      isUndefined(entity.person.id) ||
+      isNull(entity.person.id)
+    ) {
+      return of(new HttpResponse(
+        {
+          status: 201
+        }
+      ));
+    } else {
+      return of(new HttpResponse(
+        {
+          status: 200
+        }
+      ));
+    }
   }
 }
