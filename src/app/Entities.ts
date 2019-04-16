@@ -14,7 +14,7 @@ export interface Person {
   id: number;
   name: string;
   rg: string;
-  birthDate: Date;
+  birthDate: string;
 }
 
 export interface Contato {

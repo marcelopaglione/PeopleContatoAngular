@@ -83,7 +83,7 @@ export class ManagerPersonComponent implements OnInit, AfterViewInit {
         .toPromise()
         .then(person => {
           this.fg.patchValue(person.body);
-          this.fg.patchValue({ birthDate: this.formatDate( person.body.birthDate.toString()) });
+          this.fg.patchValue({ birthDate: this.service.formatDate( person.body.birthDate.toString()) });
           this.setApplicationTitle();
         });
     } else {
@@ -120,13 +120,13 @@ export class ManagerPersonComponent implements OnInit, AfterViewInit {
       id: [null],
       name: [null, Validators.required],
       rg: [null, Validators.required],
-      birthDate: ['', Validators.required]
+      birthDate: [null, Validators.required]
     });
     this.service.removeAllContatosComponents();
   }
 
   private isBirthDateInvalid() {
-    if (!this.validateDate(this.fg.value.birthDate)) {
+    if (!this.service.validateDate(this.fg.value.birthDate)) {
       this.service.setResponse({
         status: 'warning',
         message: 'Data de nascimento está inválida'
@@ -175,24 +175,18 @@ export class ManagerPersonComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  private formatDateFromUserInput() {
-    this.fg.patchValue({ birthDate: this.toDate(this.fg.value.birthDate) });
-  }
-
-  private formatDate(dateToFormt: string) {
-    const dateArray = dateToFormt.substr(0, 10).split('-');
-    const day = dateArray[2];
-    const month = dateArray[1];
-    const year = dateArray[0];
-    return `${day}/${month}/${year}`;
-  }
-
   private createEntityToPersist() {
-    const entity  = {
+    const databaseDateFormat: string = this.service.toDatabaseDate(this.fg.value.birthDate);
+    const entity: PersonContatoEntity  = {
       contatos: this.contatos,
-      person: this.fg.value
+      person: {
+        id: this.fg.value.id,
+        name: this.fg.value.name,
+        birthDate: databaseDateFormat,
+        rg: this.fg.value.rg
+      }
     };
-    entity.contatos.map(c => c.person = this.fg.value);
+    entity.contatos.map(c => c.person = entity.person);
     return entity;
   }
 
@@ -204,7 +198,6 @@ export class ManagerPersonComponent implements OnInit, AfterViewInit {
     if (!this.isValidFormToSubmit()) {
       return of('');
     }
-    this.formatDateFromUserInput();
     const entityToPersist = this.createEntityToPersist();
     return this.api
     .savePersonAndContato(entityToPersist).pipe(map(
@@ -219,19 +212,6 @@ export class ManagerPersonComponent implements OnInit, AfterViewInit {
         this.service.setResponse({ status: 'danger', message: err.error.message });
       }
     ));
-  }
-
-  private toDate(dateStr): Date {
-    const [day, month, year] = dateStr.toString().split('/');
-    return new Date(year, month - 1, day);
-  }
-
-  private validateDate(date: string): boolean {
-    const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
-    if (!dateRegex.test(date)) {
-      return false;
-    }
-    return true;
   }
 
   navigateBack() {

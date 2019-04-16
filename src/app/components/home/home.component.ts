@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Person, Page } from 'src/app/Entities';
 import { Router } from '@angular/router';
+import { ManagePersonService } from '../person/manage/manage-person.service';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  constructor(private api: PeopleApiService, private router: Router) {}
+  constructor(private api: PeopleApiService, private router: Router, private service: ManagePersonService) {}
 
   searchString = '';
   page: Page = {
@@ -38,6 +39,9 @@ export class HomeComponent implements OnInit {
   }
 
   setPaginatedDataIntoPeople(paginatedPeople: any) {
+    paginatedPeople.body.content.map(person => {
+      person.birthDate = this.service.formatDate(person.birthDate);
+    });
     this.page = paginatedPeople.body;
   }
 
