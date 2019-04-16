@@ -13,9 +13,6 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
   providedIn: 'root'
 })
 export class ManagePersonService {
-  @ViewChild('contatoRef', { read: ViewContainerRef })
-  entry: ViewContainerRef;
-  contatosComponent = [];
   contatos = [];
   response: ReponseMessage = { message: '', status: '' };
 
@@ -24,13 +21,9 @@ export class ManagePersonService {
     private resolver: ComponentFactoryResolver
   ) {}
 
-  appAddContatoComponent(contato: Contato = { name: '', id: 0, person: null }) {
-    const factory = this.resolver.resolveComponentFactory(NewContatoComponent);
-    const newContatoComponent = this.entry.createComponent(factory);
-    newContatoComponent.instance.fg.patchValue(contato);
-    newContatoComponent.instance.index = contato.id ? contato.id : Date.now();
-    this.subscribeRemoveEvent(newContatoComponent);
-    this.contatosComponent.push(newContatoComponent);
+  appAddContatoComponent(inputContato: Contato = { name: null, id: 0, person: null }) {
+    console.log('pusing contato ', inputContato);
+    this.contatos.push(inputContato);
   }
 
   private subscribeRemoveEvent(
@@ -86,7 +79,7 @@ export class ManagePersonService {
   private eventRemoveVisualContatoComponent(deleteEvent: {
     contato: Contato;
     componentIndex: number;
-  }) {
+  }) {/*
     this.entry.remove(
       this.entry.indexOf(
         this.contatosComponent.find(
@@ -94,13 +87,14 @@ export class ManagePersonService {
             contatoComponent.instance.index === deleteEvent.componentIndex
         )
       )
-    );
+    );*/
   }
 
   removeAllContatosComponents() {
-    this.contatosComponent.map(contatoComponent => {
+    // fazer splice aqui
+    /*this.contatos.map(contatoComponent => {
       this.entry.remove(this.entry.indexOf(contatoComponent));
-    });
+    });*/
   }
 
   setResponse(event: { status: string; message: string }) {

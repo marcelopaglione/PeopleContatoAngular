@@ -62,21 +62,40 @@
             contato
           </p>
         </div>
-
-
-
-        <div>
-          <ng-template #contatoRef></ng-template>
-        </div>
-
-        <div>
-          <button class="btn btn-info mr-3" (click)="save()" id="save">
-            Salvar
-          </button>
-          <button class="btn" (click)="navigateBack()">Voltar</button>
-        </div>
       </div>
     </form>
+
+    <div *ngFor="let item of contatos">
+      <div class="mt-3 mb-3">
+        <div class="form-row">
+          <div class="col-11">
+            <input
+              type="text"
+              class="form-control"
+              id="nome"
+              [(ngModel)]="item.name"
+              placeholder="Informe o nome do contato {{item.name}}"
+            />
+          </div>
+          <div class="col-1 removeButton">
+            <button
+              class="btn btn-danger"
+              title="Remover contato"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button class="btn btn-info mr-3" (click)="save()" id="save">
+        Salvar
+      </button>
+      <button class="btn" (click)="navigateBack()">Voltar</button>
+    </div>
+
   </div>
 </div>
 

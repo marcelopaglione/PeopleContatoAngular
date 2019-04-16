@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
-import { isUndefined, isNull } from 'util';
+import { isUndefined, isNull, isNullOrUndefined } from 'util';
 import {
   HttpInterceptor,
   HttpHandler,
@@ -117,9 +117,7 @@ export class PeopleApiService {
     entity: PersonContatoEntity
   ): Observable<HttpResponse<any>> {
     if (
-      entity.person.id === 0 ||
-      isUndefined(entity.person.id) ||
-      isNull(entity.person.id)
+      entity.person.id === 0 || isNullOrUndefined(entity.person.id)
     ) {
       return this.http.post<any>(
         `${this.API}contatos/savePersonAndContatos/`,

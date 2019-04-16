@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Contato, Page, PersonContatoEntity } from 'src/app/Entities';
 import { Router, ActivatedRoute } from '@angular/router';
-import { isNull } from 'util';
+import { isNull, isNullOrUndefined } from 'util';
 import { ManagePersonService } from './manage-person.service';
 import { map } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
@@ -13,9 +13,8 @@ import { combineLatest, Observable, of } from 'rxjs';
   templateUrl: './manage-person.component.html',
   styleUrls: ['./manage-person.component.scss']
 })
-export class ManagerPersonComponent implements OnInit {
-  @ViewChild('contatoRef', { read: ViewContainerRef })
-  entry: ViewContainerRef;
+export class ManagerPersonComponent implements OnInit, AfterViewInit {
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -33,11 +32,12 @@ export class ManagerPersonComponent implements OnInit {
   idFromUrlParam = 0;
   fg: FormGroup;
 
-  allData$: Observable<PersonContatoEntity>;
-
   ngOnInit() {
-    this.allData$ = this.loadPersonAndThenContatos();
     this.initializePageData();
+  }
+
+  ngAfterViewInit(): void {
+
   }
 
   get response() {
@@ -45,57 +45,35 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   get contatosComponent() {
-    return this.service.contatosComponent;
+    return this.service.contatos;
   }
 
-  get contatos() {
+  get contatos(): Contato[] {
+    console.log('getting contatos ', this.service.contatos);
     return this.service.contatos;
   }
 
   appAddContatoComponent() {
-    const internalForm = this.formBuilder.group({
-      id: [null],
-      name: [null, Validators.required],
-      person: [null]
-    });
-    internalForm.patchValue({name: 'asdasf'});
-    this.service.contatos.push([
-      {
-        fg: internalForm,
-        name: 'aaff'
-      }
-    ]);
-
     this.service.appAddContatoComponent();
   }
 
   private initService() {
-    this.service.entry = this.entry;
-    this.service.contatosComponent = [];
+    this.service.contatos = [];
     this.service.response.status = '';
     this.service.response.message = '';
   }
 
-  private getContatosFromContatosComponents() {
-    const contatos = [];
-    this.service.contatosComponent.map(contato => {
-      const contatoForm: Contato = contato.instance.fg.value;
-      contatoForm.person = this.fg.value;
-      contatos.push(contatoForm);
-    });
-    return contatos;
-  }
-
   private setApplicationTitle() {
-    isNull(this.fg.value.id)
+    isNullOrUndefined(this.fg.value.id)
       ? (this.title = 'Cadastrar Nova Pessoa')
       : (this.title = 'Editar Pessoa');
   }
 
   initializePageData() {
     this.initializeForm();
-    this.loadPerson();
     this.initService();
+    this.loadPerson();
+    this.loadContatos();
   }
 
   loadPerson() {
@@ -108,8 +86,6 @@ export class ManagerPersonComponent implements OnInit {
           this.fg.patchValue({ birthDate: this.formatDate( person.body.birthDate.toString()) });
           this.setApplicationTitle();
         });
-
-      this.loadContatos();
     } else {
       this.setApplicationTitle();
     }
@@ -122,6 +98,7 @@ export class ManagerPersonComponent implements OnInit {
         .toPromise()
         .then(contatos => {
           contatos.body.map(contato => {
+            console.log('loading contato ', contato);
             this.service.appAddContatoComponent(contato);
           });
         });
@@ -171,21 +148,27 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   private isAllContatosValid() {
-    if (!this.service.contatosComponent.every(item => item.instance.fg.valid)) {
+    this.service.contatos.map(form => {
+      console.log(console.log(form), isNullOrUndefined(form.name));
+    });
+    if (this.contatos.every(contato => !isNullOrUndefined(contato.name))) {
+      return true;
+    } else {
       this.service.setResponse({
         status: 'warning',
         message: 'Preencha o nome de todos os contatos'
       });
       return false;
     }
-    return true;
+
   }
 
   private isValidFormToSubmit() {
     if (
+      !this.isAllContatosValid() ||
       this.ifFormGroupInvalid() ||
-      this.isBirthDateInvalid() ||
-      !this.isAllContatosValid()
+      this.isBirthDateInvalid()
+
     ) {
       return false;
     }
@@ -205,15 +188,15 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   private createEntityToPersist() {
-    return {
-      contatos: this.getContatosFromContatosComponents(),
+    const entity  = {
+      contatos: this.contatos,
       person: this.fg.value
     };
+    entity.contatos.map(c => c.person = this.fg.value);
+    return entity;
   }
 
   save() {
-    this.service.contatos.map(form => console.log(form));
-
     this.savePerson().subscribe();
   }
 
@@ -228,7 +211,7 @@ export class ManagerPersonComponent implements OnInit {
       data => {
         if (data.status === 200 || data.status === 201) {
           this.service.setResponse({ status: 'success', message: `${this.fg.value.name} foi salvo com sucesso!` });
-          this.initializePageData();
+          // this.initializePageData();
         }
       },
       err => { err.status === 400 ?
