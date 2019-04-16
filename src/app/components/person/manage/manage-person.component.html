@@ -47,7 +47,7 @@
               type="button"
               id="addNewContato"
               class="btn btn-info mr-2"
-              (click)="createComponent(null)"
+              (click)="appAddContatoComponent()"
               title="Adicionar Novo Contato"
             >
               <i class="fas fa-plus-circle"></i>
@@ -56,7 +56,7 @@
         </div>
         <hr />
 
-        <div *ngIf="componentsReferences.length === 0">
+        <div *ngIf="contatosComponent.length === 0">
           <p>
             <i class="fas fa-exclamation-circle mr-3"></i>Adicione seu primeiro
             contato
@@ -64,7 +64,7 @@
         </div>
 
         <div>
-          <ng-template #viewContainerRef></ng-template>
+          <ng-template #contatoRef></ng-template>
         </div>
 
         <div>
