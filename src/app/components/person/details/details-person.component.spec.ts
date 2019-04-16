@@ -6,32 +6,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { PeopleApiService } from 'src/app/services/people-api.service';
-import { Observable, of } from 'rxjs';
-
-class MockPeopleApiService {
-  authenticated = false;
-  getContatoByPersonId(): Observable<any> {
-    return of({
-      body: [
-        {
-          id: 1,
-          name: 'Contato Name',
-          person: null
-        }
-      ]
-    });
-  }
-  getPersonById(): Observable<any> {
-    return of({
-      body: {
-        id: 1,
-        name: 'Person name',
-        rg: '101010',
-        birthDate: null
-      }
-    });
-  }
-}
+import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
 
 describe('DetailsPersonComponent', () => {
   let component: DetailsPersonComponent;
@@ -70,7 +45,6 @@ describe('DetailsPersonComponent', () => {
   });
 
   it('should be able to load contatos from database', done => {
-    console.log('start');
     component.ngOnInit();
     component.allData$.subscribe(data => {
       console.log(data);
@@ -79,7 +53,6 @@ describe('DetailsPersonComponent', () => {
       data.contatos.map(c => {
         expect(c.id).toEqual(1);
       });
-      console.log('end');
       done();
     });
   });
