@@ -103,7 +103,6 @@ export class HomeComponent implements OnInit {
   }
 
   reciverFeedbackFromPagination(feedback) {
-    console.log('Foi emitido >>>> ', feedback);
     this.page = feedback.page;
     this.updateListViewAtPage();
   }

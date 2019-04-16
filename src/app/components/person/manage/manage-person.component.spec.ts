@@ -1,30 +1,28 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core/testing';
 
 import { ManagerPersonComponent } from './manage-person.component';
 import { TitleComponent } from '../../shared/title/title.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from '../../shared/alert/alert.component';
 import { RouterModule, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { PeopleApiService } from 'src/app/services/people-api.service';
-import { NewContatoComponent } from '../../contato/new-contato.component';
 import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
 import { Person, Contato } from 'src/app/Entities';
-import { ViewContainerRef } from '@angular/core';
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
-  let service: PeopleApiService;
   let fixture: ComponentFixture<ManagerPersonComponent>;
   let router: Router;
 
-  const mockPerson: Person = {id: null, name: 'Nova Pessoa Full Name', rg: '1597534682', birthDate: null};
-  const mockContato: Contato = {id: 0, name: 'Seu Aparecido', person: mockPerson};
+  let mockPerson: Person;
+  let mockContato: Contato;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
         ReactiveFormsModule,
+        FormsModule,
         HttpClientModule,
         RouterModule,
         RouterTestingModule
@@ -33,7 +31,6 @@ describe('ManagerPersonComponent', () => {
         ManagerPersonComponent,
         TitleComponent,
         AlertComponent,
-        NewContatoComponent
       ],
       providers: [{ provide: PeopleApiService, useClass: MockPeopleApiService }]
     }).compileComponents();
@@ -44,8 +41,16 @@ describe('ManagerPersonComponent', () => {
     fixture = TestBed.createComponent(ManagerPersonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.entry = TestBed.createComponent(ViewContainerRef).componentInstance;
+    mockPerson = {id: null, name: 'Nova Pessoa Full Name', rg: '1597534682', birthDate: '31/01/2015'};
+    mockContato = {id: 0, name: 'Seu Aparecido', person: mockPerson};
+    spyOn(component, 'ngOnInit').and.callThrough();
     component.ngOnInit();
+
+    jasmine.getEnv().addReporter({
+      specStarted(result) {
+        console.log(result.fullName);
+      }
+    });
   });
 
   it('should create', () => {
@@ -54,7 +59,8 @@ describe('ManagerPersonComponent', () => {
 
   it('shouldn not save form with null birthDate', done => {
     component.fg.patchValue(mockPerson);
-    component.savePerson().subscribe(data => {
+    component.fg.patchValue({ birthDate: null });
+    component.savePerson().subscribe(() => {
       expect(component.response.status).toEqual('warning');
       expect(component.response.message).toEqual('Formulário inválido');
       done();
@@ -62,9 +68,10 @@ describe('ManagerPersonComponent', () => {
   });
 
   it('shouldn not save form with empty name', done => {
+    component.initializePageContent();
     component.fg.patchValue(mockPerson);
     component.fg.patchValue({ name: '' });
-    component.savePerson().subscribe(data => {
+    component.savePerson().subscribe(() => {
       expect(component.response.status).toEqual('warning');
       expect(component.response.message).toEqual('Formulário inválido');
       done();
@@ -74,7 +81,7 @@ describe('ManagerPersonComponent', () => {
   it('shouldn not save form with empty rg', done => {
     component.fg.patchValue(mockPerson);
     component.fg.patchValue({ rg: '' });
-    component.savePerson().subscribe(data => {
+    component.savePerson().subscribe(() => {
       expect(component.response.status).toEqual('warning');
       expect(component.response.message).toEqual('Formulário inválido');
       done();
@@ -83,33 +90,69 @@ describe('ManagerPersonComponent', () => {
 
   it('shouldn not save form with invalid birthDate', done => {
     component.fg.patchValue(mockPerson);
-    component.fg.patchValue({ birthDate: '31/31/1900' });
-    component.savePerson().subscribe(data => {
+    component.fg.patchValue({ birthDate: '12/31/2015' });
+    component.savePerson().subscribe(() => {
       expect(component.response.status).toEqual('warning');
       expect(component.response.message).toEqual('Data de nascimento está inválida');
       done();
     });
   });
 
-  it('shouldn not save form contatos and contato.name is empty', done => {
+  it('should set title to edit person when page receive a id parameter', () => {
+    component.idFromUrlParam  = 1;
+    component.ngOnInit();
+    expect(component.title).toEqual('Editar Pessoa');
+  });
+
+  it('shouldn not save form with contatos with empty name ', done => {
     component.fg.patchValue(mockPerson);
-    component.fg.patchValue({ birthDate: '31/12/1990' });
     component.appAddContatoComponent();
-    component.savePerson().subscribe(data => {
+    expect(component.contatos.length).toBe(1);
+
+    component.savePerson().subscribe(() => {
       expect(component.response.status).toEqual('warning');
-      expect(component.response.message).toEqual('Data de nascimento está inválida');
+      expect(component.response.message).toEqual('Preencha o nome de todos os contatos');
       done();
     });
   });
 
   it('should save a person with no contatos', done => {
     component.fg.patchValue(mockPerson);
-    component.fg.patchValue({ birthDate: '12/04/1900' });
-    component.savePerson().subscribe(data => {
-      console.log('save', data);
-      expect(data.status).toEqual(201);
+    component.savePerson().subscribe(() => {
+      expect(component.response.status).toBe('success');
       done();
     });
   });
 
+  it('should save a person with 1 new contatos', done => {
+    component.fg.patchValue(mockPerson);
+    component.appAddContatoComponent(mockContato);
+    component.savePerson().subscribe(() => {
+      expect(component.response.status).toBe('success');
+      done();
+    });
+  });
+
+  it('should load the person from parameter id', done => {
+    component.idFromUrlParam = 1;
+    component.loadPersonAndContatos().subscribe(data => {
+      expect(data.person.id).toBe(1);
+      expect(data.contatos.length).toBe(1);
+      done();
+    });
+  });
+
+  it('should be able to navigate to `/home`', () => {
+    const navigateSpy = spyOn(router, 'navigate');
+    component.navigateBack();
+    expect(navigateSpy).toHaveBeenCalledWith(['home']);
+  });
+
+  it('should remove visual contato', () => {
+    component.appAddContatoComponent(mockContato);
+    expect(component.contatos.length).toBe(1);
+    component.removeContato(mockContato);
+    expect(component.contatos.length).toBe(0);
+
+  });
 });

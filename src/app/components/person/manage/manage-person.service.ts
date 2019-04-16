@@ -1,13 +1,8 @@
-import {
-  Injectable,
-  ComponentRef,
-  ViewChild,
-  ViewContainerRef,
-  ComponentFactoryResolver
-} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Contato, ReponseMessage } from 'src/app/Entities';
-import { NewContatoComponent } from '../../contato/new-contato.component';
 import { PeopleApiService } from 'src/app/services/people-api.service';
+import { isNullOrUndefined } from 'util';
+import { FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -17,51 +12,35 @@ export class ManagePersonService {
   response: ReponseMessage = { message: '', status: '' };
 
   constructor(
-    private api: PeopleApiService,
-    private resolver: ComponentFactoryResolver
+    private api: PeopleApiService
   ) {}
 
-  appAddContatoComponent(inputContato: Contato = { name: null, id: 0, person: null }) {
-    console.log('pusing contato ', inputContato);
+  appAddContatoComponent(inputContato: Contato) {
     this.contatos.push(inputContato);
   }
 
-  private subscribeRemoveEvent(
-    newContatoComponent: ComponentRef<NewContatoComponent>
-  ) {
-    newContatoComponent.instance.event.subscribe(event =>
-      this.eventDeleteContato(event)
-    );
-  }
-
-  private eventDeleteContato(deleteEvent: {
-    contato: Contato;
-    componentIndex: number;
-  }) {
-    if (deleteEvent.contato.id !== 0) {
+  removeContato(contato: Contato) {
+    if (contato.id !== 0) {
       if (
         !confirm(
-          `Você ter certeza que deseja remover ${deleteEvent.contato.name}`
+          `Você ter certeza que deseja remover ${contato.name}`
         )
       ) {
         return;
       }
-      this.eventRemoveContatoFromDatabase(deleteEvent);
+      this.eventRemoveContatoFromDatabase(contato);
     } else {
-      this.eventRemoveVisualContatoComponent(deleteEvent);
+      this.eventRemoveVisualContatoComponent(contato);
     }
   }
 
-  private eventRemoveContatoFromDatabase(deleteEvent: {
-    contato: Contato;
-    componentIndex: number;
-  }) {
+  private eventRemoveContatoFromDatabase(contato: Contato) {
     this.api
-      .deleteContatoById(deleteEvent.contato.id)
+      .deleteContatoById(contato.id)
       .toPromise()
       .then(data => {
         if (data.status === 200) {
-          this.eventRemoveVisualContatoComponent(deleteEvent);
+          this.eventRemoveVisualContatoComponent(contato);
           this.setResponse({
             status: 'success',
             message: 'Contato Removido com sucesso'
@@ -76,25 +55,10 @@ export class ManagePersonService {
       });
   }
 
-  private eventRemoveVisualContatoComponent(deleteEvent: {
-    contato: Contato;
-    componentIndex: number;
-  }) {/*
-    this.entry.remove(
-      this.entry.indexOf(
-        this.contatosComponent.find(
-          contatoComponent =>
-            contatoComponent.instance.index === deleteEvent.componentIndex
-        )
-      )
-    );*/
-  }
-
-  removeAllContatosComponents() {
-    // fazer splice aqui
-    /*this.contatos.map(contatoComponent => {
-      this.entry.remove(this.entry.indexOf(contatoComponent));
-    });*/
+  private eventRemoveVisualContatoComponent(contato: Contato) {
+    this.contatos = this.contatos.filter((value, index, arr) => {
+      return value !== contato;
+    });
   }
 
   setResponse(event: { status: string; message: string }) {
@@ -121,11 +85,58 @@ export class ManagePersonService {
   }
 
   validateDate(date: string): boolean {
-    console.log('validate date', date);
+    if (isNullOrUndefined(date)) {
+      return false;
+    }
     const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
     if (!dateRegex.test(date)) {
       return false;
     }
     return true;
+  }
+
+  isValidFormToSubmit(fg: FormGroup) {
+    if (
+      this.ifFormGroupInvalid(fg) ||
+      this.isBirthDateInvalid(fg.value.birthDate) ||
+      !this.isAllContatosValid()
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  private isBirthDateInvalid(birthDate: string) {
+    if (!this.validateDate(birthDate)) {
+      this.setResponse({
+        status: 'warning',
+        message: 'Data de nascimento está inválida'
+      });
+      return true;
+    }
+    return false;
+  }
+
+  private ifFormGroupInvalid(fg: FormGroup) {
+    if (!fg.valid) {
+      this.setResponse({
+        status: 'warning',
+        message: 'Formulário inválido'
+      });
+      return true;
+    }
+    return false;
+  }
+
+  private isAllContatosValid() {
+    if (this.contatos.every(contato => !isNullOrUndefined(contato.name))) {
+      return true;
+    } else {
+      this.setResponse({
+        status: 'warning',
+        message: 'Preencha o nome de todos os contatos'
+      });
+      return false;
+    }
   }
 }

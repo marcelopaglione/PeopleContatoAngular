@@ -47,7 +47,6 @@ describe('DetailsPersonComponent', () => {
   it('should be able to load contatos from database', done => {
     component.ngOnInit();
     component.allData$.subscribe(data => {
-      console.log(data);
       expect(data.contatos.length).toBe(1);
       expect(data.person.id).toEqual(1);
       data.contatos.map(c => {

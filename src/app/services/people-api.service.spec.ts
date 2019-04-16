@@ -541,7 +541,7 @@ describe('PeopleApiService', () => {
     const person: Person = {
       name: 'Beatiful Name',
       rg: '10101010101',
-      birthDate: new Date(),
+      birthDate: '',
       id: 1
     };
     const expected = { body: person, status: 201 };
@@ -557,7 +557,7 @@ describe('PeopleApiService', () => {
       expect(data.status).toBe(201);
       expect(data.body.name).toBe(person.name);
       expect(data.body.rg).toBe(person.rg);
-      expect(new Date(data.body.birthDate)).toEqual(person.birthDate);
+      expect(data.body.birthDate).toEqual(person.birthDate);
       expect(data.body.id).toBeGreaterThan(0);
       done();
     });
@@ -567,7 +567,7 @@ describe('PeopleApiService', () => {
     const relatedPerson: Person = {
       name: 'Beatiful Person Name',
       rg: '10101010101',
-      birthDate: new Date(),
+      birthDate: '',
       id: 1
     };
     const contato: Contato = {
@@ -596,7 +596,7 @@ describe('PeopleApiService', () => {
     const relatedPerson: Person = {
       name: 'Person Name 1',
       rg: '10101010101',
-      birthDate: new Date(),
+      birthDate: '',
       id: 0
     };
     const contato1: Contato = {
@@ -637,7 +637,7 @@ describe('PeopleApiService', () => {
     const person: Person = {
       name: 'Beatiful Name',
       rg: '10101010101',
-      birthDate: new Date(),
+      birthDate: '',
       id: 1
     };
     const expected = { body: person, status: 200 };
@@ -661,7 +661,7 @@ describe('PeopleApiService', () => {
     const relatedPerson: Person = {
       name: 'Beatiful Person Name',
       rg: '10101010101',
-      birthDate: new Date(),
+      birthDate: '',
       id: 0
     };
     const contato: Contato = {
@@ -705,7 +705,7 @@ describe('PeopleApiService', () => {
     const relatedPerson: Person = {
       name: 'Beatiful Person Name',
       rg: '10101010101',
-      birthDate: new Date(),
+      birthDate: '',
       id: 0
     };
     const contato: Contato = {

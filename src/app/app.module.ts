@@ -9,7 +9,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AlertComponent } from './components/shared/alert/alert.component';
 import { HomeComponent } from './components/home/home.component';
-import { NewContatoComponent } from './components/contato/new-contato.component';
 import { ManagerPersonComponent } from './components/person/manage/manage-person.component';
 import { PaginationComponent } from './components/shared/pagination/pagination.component';
 import { DetailsPersonComponent } from './components/person/details/details-person.component';
@@ -17,7 +16,6 @@ import { DetailsPersonComponent } from './components/person/details/details-pers
 @NgModule({
   declarations: [
     AppComponent,
-    NewContatoComponent,
     MenuComponent,
     ManagerPersonComponent,
     TitleComponent,
@@ -33,7 +31,6 @@ import { DetailsPersonComponent } from './components/person/details/details-pers
     ReactiveFormsModule,
     HttpClientModule
   ],
-  entryComponents: [NewContatoComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [],
   bootstrap: [AppComponent]
