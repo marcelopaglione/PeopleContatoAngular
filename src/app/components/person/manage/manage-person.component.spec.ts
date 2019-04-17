@@ -116,6 +116,15 @@ describe('ManagerPersonComponent', () => {
     expect(component.response.status).toBe('success');
   });
 
+  it('should update a person with 1 contato', () => {
+    mockPerson.id = 14;
+    component.fg.patchValue(mockPerson);
+    component.appAddContatoComponent(mockContato);
+    component.save();
+    fixture.detectChanges();
+    expect(component.response.status).toBe('success');
+  });
+
   it('should load the person from parameter id', () => {
     component.idFromUrlParam = 1;
     mockPerson.id = 1;
