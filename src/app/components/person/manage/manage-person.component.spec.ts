@@ -11,6 +11,7 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
 import { Person, Contato } from 'src/app/Entities';
 import { dateValidator } from '../../shared/forms/date.validator';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
   let fixture: ComponentFixture<ManagerPersonComponent>;
@@ -27,6 +28,7 @@ describe('ManagerPersonComponent', () => {
         HttpClientModule,
         RouterModule,
         RouterTestingModule,
+        NgbModule
       ],
       declarations: [
         ManagerPersonComponent,
@@ -120,7 +122,8 @@ describe('ManagerPersonComponent', () => {
     mockPerson.id = 1;
     component.ngOnInit();
     fixture.detectChanges();
-    expect(component.fg.value).toEqual(mockPerson);
+    expect(component.fg.value.id).toEqual(mockPerson.id);
+    expect(component.fg.value.name).toEqual(mockPerson.name);
   });
 
   it('should be able to navigate to `/home`', () => {

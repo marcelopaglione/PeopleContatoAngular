@@ -98,7 +98,7 @@ describe('HomeComponent', () => {
 
     const spy = spyOn(
       component,
-      'apiLoadPeoplePaginatedFromDatabase'
+      'loadPeoplePaginatedFromDatabase'
     ).and.returnValue(observable);
     spyOn(component, 'search').and.callThrough();
     component.searchString = '';
