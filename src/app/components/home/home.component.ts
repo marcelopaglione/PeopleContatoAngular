@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter } from '@angular/core';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Person, Page } from 'src/app/Entities';
 import { Router } from '@angular/router';
@@ -24,6 +24,7 @@ export class HomeComponent implements OnInit {
     numberOfElements: 0,
     empty: true
   };
+  initPage: EventEmitter<Page> = new EventEmitter();
 
   ngOnInit() {
     this.loadPeoplePaginatedFromDatabase();
@@ -33,6 +34,9 @@ export class HomeComponent implements OnInit {
     this.api.getPeople(this.page)
     .pipe(map(data => data.body))
     .subscribe(paginatedPeople => {
+      if (this.page.empty) {
+        this.initPage.emit(paginatedPeople);
+      }
       this.page = paginatedPeople;
     });
   }
