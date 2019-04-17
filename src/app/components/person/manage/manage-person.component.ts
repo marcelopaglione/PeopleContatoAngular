@@ -1,11 +1,11 @@
 import { Component, OnInit} from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AsyncValidatorFn, FormControl } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
-import { Contato,  PersonContatoEntity } from 'src/app/Entities';
+import { Contato,  PersonContatoEntity, Page } from 'src/app/Entities';
 import { Router, ActivatedRoute } from '@angular/router';
 import { isNullOrUndefined } from 'util';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, tap, delay } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-manage-person',
@@ -28,18 +28,45 @@ export class ManagerPersonComponent implements OnInit {
   title: string;
   contatos: Contato[] = [];
   response = { message: '', status: '' };
-  fg: FormGroup = this.formBuilder.group({
-    id: [null],
-    name: [null, [Validators.required, Validators.minLength(3)]],
-    rg: [null, [Validators.required, Validators.minLength(8)]],
-    birthDate: [null, [Validators.required]]
-  });
+  fg: FormGroup;
 
   ngOnInit() {
     isNullOrUndefined(this.idFromUrlParam)
       ? (this.title = 'Cadastrar Nova Pessoa')
       : (this.title = 'Editar Pessoa');
+
+    this.fg = this.formBuilder.group({
+        id: [null],
+        name: [null, [Validators.required, Validators.minLength(3)], [this.validDateNameExistsOnDatabase.bind(this)]],
+        rg: [null, [Validators.required, Validators.minLength(8)]],
+        birthDate: [null, [Validators.required]]
+      });
     this.initializePageContent();
+  }
+
+  validDateNameExistsOnDatabase(fg: FormControl) {
+    const page: Page = {
+      content: [],
+      first: true,
+      last: false,
+      totalElements: 0,
+      totalPages: 0,
+      number: 0,
+      size: 5,
+      numberOfElements: 0,
+      empty: true
+    };
+    return this.api
+    .getPersonByNameContaining(this.fg.value.name, page)
+    .pipe(
+      delay(2000),
+      map(data => data.body),
+       tap(data => console.log(1, data)),
+      map(data => data.content),
+       tap(data => console.log(data)),
+      map(data => data.length > 0 ? { userAlredyExists: true } : {}),
+       tap(console.log),
+    );
   }
 
   appAddContatoComponent(inputContato: Contato = { name: null, id: 0, person: null }) {

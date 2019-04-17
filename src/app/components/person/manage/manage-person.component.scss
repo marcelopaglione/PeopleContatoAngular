@@ -16,3 +16,14 @@ button.calendar, button.calendar:active {
   background-size: 23px;
   background-position: center;
 }
+
+.form-group {
+  .validating {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem #ffc10766;
+  }
+
+  .valid {
+    border-color: #2d8a15;
+  }
+}

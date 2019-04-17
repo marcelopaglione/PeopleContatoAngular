@@ -5,7 +5,12 @@
     <form [formGroup]="fg" (ngSubmit)="save()">
       <div class="form-group">
         <label for="name">Nome</label>
-        <input [ngClass]="{'is-invalid': !fg.get('name').valid && fg.get('name').touched}"
+        <input
+          [ngClass]="{
+            'validating': fg.get('name').status === 'PENDING',
+            'valid': fg.get('name').status === 'VALID',
+            'is-invalid': fg.get('name').status === 'INVALID' && fg.get('name').touched
+          }"
           type="text"
           class="form-control"
           id="name"
