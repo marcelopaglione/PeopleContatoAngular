@@ -10,7 +10,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
 import { Person, Contato } from 'src/app/Entities';
-import { dateValidator } from '../../shared/forms/date.validator';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
@@ -35,7 +34,7 @@ describe('ManagerPersonComponent', () => {
         TitleComponent,
         AlertComponent,
       ],
-      providers: [{ provide: PeopleApiService, useClass: MockPeopleApiService }, dateValidator]
+      providers: [{ provide: PeopleApiService, useClass: MockPeopleApiService }]
     }).compileComponents();
     router = TestBed.get(Router);
   }));
