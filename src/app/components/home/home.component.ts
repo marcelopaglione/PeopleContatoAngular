@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Person, Page } from 'src/app/Entities';
 import { Router } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -29,8 +30,10 @@ export class HomeComponent implements OnInit {
   }
 
   loadPeoplePaginatedFromDatabase() {
-    this.api.getPeople(this.page).subscribe(paginatedPeople => {
-      this.page = paginatedPeople.body;
+    this.api.getPeople(this.page)
+    .pipe(map(data => data.body))
+    .subscribe(paginatedPeople => {
+      this.page = paginatedPeople;
     });
   }
 
@@ -42,57 +45,35 @@ export class HomeComponent implements OnInit {
     this.router.navigate([`details/${personId}`]);
   }
 
-  apiRemovePerson(id) {
-    return this.api.deletePersonById(id);
-  }
   removerPerson(person: Person) {
     if (confirm(`Você ter certeza que deseja remover ${person.name}`)) {
-      this.apiRemovePerson(person.id).subscribe(data => {
-        data.status === 200
-          ? this.loadPeoplePaginatedFromDatabase()
-          : console.log(`Houve um erro ao deletar person ${person}`);
+      this.api.deletePersonById(person.id)
+        .subscribe(data => {
+          data.status === 200 ?
+          this.loadPeoplePaginatedFromDatabase() :
+          alert(`Houve um erro ao deletar person ${person}`);
       });
     }
   }
 
-  keyDownFunction(event) {
+  keyDownFunction(event: { keyCode: any; }) {
     if (event.keyCode === 13) {
-      this.searchFromInputUser();
+      this.page.number = 0;
+      this.search();
     }
-  }
-
-  searchFromInputUser() {
-    this.page.number = 0;
-    this.search();
-  }
-
-  apiGetPersonByNameContaining() {
-    return this.api.getPersonByNameContaining(this.searchString, this.page);
   }
 
   search() {
-    if (this.searchString === '') {
-      this.loadPeoplePaginatedFromDatabase();
-      return;
-    }
-
-    this.apiGetPersonByNameContaining()
-      .toPromise()
-      .then(paginatedPeople => {
-        this.page = paginatedPeople.body;
-      });
+    !this.searchString ?
+    this.loadPeoplePaginatedFromDatabase() :
+    this.api
+      .getPersonByNameContaining(this.searchString, this.page)
+      .pipe(map(data => data.body))
+      .subscribe(body => this.page = body);
   }
 
-  updateListViewAtPage() {
-    if (this.searchString !== '') {
-      this.search();
-    } else {
-      this.loadPeoplePaginatedFromDatabase();
-    }
-  }
-
-  reciverFeedbackFromPagination(feedback) {
+  reciverFeedbackFromPagination(feedback: { page: Page; }) {
     this.page = feedback.page;
-    this.updateListViewAtPage();
+    this.search();
   }
 }

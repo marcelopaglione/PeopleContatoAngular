@@ -8,13 +8,15 @@ import { AlertComponent } from '../shared/alert/alert.component';
 import { RouterModule, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
-import { Observable } from 'rxjs';
-import { Page } from 'src/app/Entities';
+import { Person } from 'src/app/Entities';
+import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
+import { PeopleApiService } from 'src/app/services/people-api.service';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
   let router: Router;
+  let service: MockPeopleApiService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -30,9 +32,11 @@ describe('HomeComponent', () => {
         TitleComponent,
         AlertComponent,
         PaginationComponent
-      ]
+      ],
+      providers: [{ provide: PeopleApiService, useClass: MockPeopleApiService }]
     }).compileComponents();
     router = TestBed.get(Router);
+    service = TestBed.get(PeopleApiService);
   }));
 
   beforeEach(() => {
@@ -62,85 +66,58 @@ describe('HomeComponent', () => {
   });
 
   it('should be able to search for person by input string after enter key enter', () => {
-    const spy = spyOn(component, 'searchFromInputUser').and.returnValue(true);
-    spyOn(component, 'keyDownFunction').and.callThrough();
-    component.keyDownFunction({ keyCode: 13 });
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('should reset page number before search', () => {
-    const spy = spyOn(component, 'search').and.returnValue(true);
-    spyOn(component, 'searchFromInputUser').and.callThrough();
-    component.page.number = 10;
-    component.searchFromInputUser();
-    expect(component.page.number).toBe(0);
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('should perform a search', () => {
-    const expected: Page = {
-      content: [],
-      first: true,
-      last: false,
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-      size: 10,
-      numberOfElements: 0,
-      empty: true
-    };
-    const observable = Observable.create(observer => {
-      setTimeout(() => {
-        observer.next({ body: expected });
-        observer.complete();
-      }, 10);
-    });
-
-    const spy = spyOn(
-      component,
-      'apiLoadPeoplePaginatedFromDatabase'
-    ).and.returnValue(observable);
-    spyOn(component, 'search').and.callThrough();
-    component.searchString = '';
-    component.search();
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('should perform a search with input valur from the user', () => {
-    const observable = Observable.create(observer => {
-      setTimeout(() => {
-        observer.next({ body: component.page });
-        observer.complete();
-      }, 1000);
-    });
-    const spy = spyOn(
-      component,
-      'apiGetPersonByNameContaining'
-    ).and.returnValue(observable);
-
-    spyOn(component, 'search').and.callThrough();
     component.searchString = 'ABC';
-    component.search();
-    expect(spy).toHaveBeenCalled();
+    component.keyDownFunction({keyCode: 13});
+    fixture.detectChanges();
+    expect(component.page.number).toEqual(0);
+    expect(component.page.content.length).toEqual(1);
+  });
+
+  it('should be able to search for person by empty input string after enter key enter', () => {
+    component.searchString = '';
+    component.keyDownFunction({keyCode: 13});
+    fixture.detectChanges();
+    expect(component.page.number).toEqual(0);
+    expect(component.page.content.length).toEqual(1);
   });
 
   it('should receive feedback from the pagination component and update list view with empty search and user search', () => {
     component.searchString = 'ASC';
-    const spy = spyOn(component, 'updateListViewAtPage').and.callThrough();
-    spyOn(component, 'reciverFeedbackFromPagination').and.callThrough();
-    spyOn(component, 'loadPeoplePaginatedFromDatabase').and.returnValue(false);
-
-    component.reciverFeedbackFromPagination({
-      event: 'changeMaxItemsPerPage',
-      page: component.page
-    });
-    expect(spy).toHaveBeenCalled();
-
     component.searchString = '';
-    component.reciverFeedbackFromPagination({
-      event: 'changeMaxItemsPerPage',
-      page: component.page
-    });
-    expect(spy).toHaveBeenCalled();
+    const mockPage = component.page;
+    mockPage.number = 18;
+    component.reciverFeedbackFromPagination({page: mockPage});
+    expect(component.page.number).toEqual(mockPage.number);
+    expect(component.page.content.length).toEqual(1);
+  });
+
+  it('should remove person', () => {
+    const mockPerson: Person = {id: 15, name: 'Person 15', birthDate: new Date(1500, 12, 31), rg: '1919191'};
+    spyOn(window, 'confirm').and.returnValue(true);
+    const spy = spyOn(component, 'loadPeoplePaginatedFromDatabase');
+    component.removerPerson(mockPerson);
+    fixture.detectChanges();
+    // ngOnInit + delete Call == 2
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not find person when remove a person', () => {
+    const mockPerson: Person = {id: 0, name: 'Person 15', birthDate: new Date(1500, 12, 31), rg: '1919191'};
+    spyOn(window, 'confirm').and.returnValue(true);
+    const spy = spyOn(window, 'alert');
+    component.removerPerson(mockPerson);
+    fixture.detectChanges();
+    // ngOnInit + delete Call == 2
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not remove person', () => {
+    const mockPerson: Person = {id: 15, name: 'Person 15', birthDate: new Date(1500, 12, 31), rg: '1919191'};
+    spyOn(window, 'confirm').and.returnValue(false);
+    const spy = spyOn(component, 'loadPeoplePaginatedFromDatabase');
+    component.removerPerson(mockPerson);
+    fixture.detectChanges();
+    // ngOnInit + no delete Call == 1
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });
