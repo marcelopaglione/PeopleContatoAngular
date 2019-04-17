@@ -142,9 +142,9 @@ export class ManagerPersonComponent implements OnInit {
     return entity;
   }
 
-  save$() {
+  save() {
     if (!this.service.isAllContatosValid()) {
-      return of('');
+      return;
     }
     const entityToPersist = this.createEntityToPersist();
     return this.api.savePersonAndContato(entityToPersist).pipe(
@@ -156,14 +156,26 @@ export class ManagerPersonComponent implements OnInit {
           });
         }
       })
-    );
+    ).subscribe();
+  }
+
+  removeContato(contato: Contato) {
+    if (!this.dialogConfirmDeleteContaot(contato)) {
+      return;
+    }
+    if (contato.id !== 0) {
+      this.service.eventRemoveContatoFromDatabase(contato);
+      return;
+    }
+    this.service.eventRemoveVisualContatoComponent(contato);
+  }
+
+  private dialogConfirmDeleteContaot(contato: Contato) {
+    return confirm(`Você tem certeza que deseja remover ${contato.name}`);
   }
 
   navigateBack() {
     this.router.navigate(['home']);
   }
 
-  removeContato(contato: Contato) {
-    this.service.removeContato(contato);
-  }
 }

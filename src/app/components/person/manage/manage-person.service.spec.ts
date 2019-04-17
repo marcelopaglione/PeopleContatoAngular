@@ -28,28 +28,6 @@ describe('ManagePersonService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should remove contato from database and return 200', () => {
-    /*mockContato.id = 1;
-    spyOn(service as any, 'removeContatoFromDatabase').and.callThrough();
 
-    service.removeContatoFromDatabase(mockContato)
-      .subscribe(data => {
-        expect(service.response.status).toEqual('success');
-        console.log(data);
-        done();
-    });*/
-  });
-
-  it('should remove contato from database and return 404', () => {
-    /*mockContato.id = null;
-    spyOn(service as any, 'removeContatoFromDatabase').and.callThrough();
-
-    service.removeContatoFromDatabase(mockContato)
-      .subscribe(data => {
-        expect(service.response.status).toEqual('warning');
-        console.log(data);
-        done();
-    });*/
-  });
 
 });

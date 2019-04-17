@@ -19,20 +19,7 @@ export class ManagePersonService {
     this.contatos.push(inputContato);
   }
 
-  removeContato(contato: Contato) {
-    if (!this.dialogConfirmDeleteContaot(contato)) {
-      return;
-    }
-    if (contato.id !== 0) {
-      this.eventRemoveContatoFromDatabase(contato);
-      return;
-    }
-    this.eventRemoveVisualContatoComponent(contato);
-  }
 
-  private dialogConfirmDeleteContaot(contato: Contato) {
-    return confirm(`Você tem certeza que deseja remover ${contato.name}`);
-  }
 
   eventRemoveContatoFromDatabase(contato: Contato) {
     this.removeContatoFromDatabase(contato).subscribe();
@@ -57,7 +44,7 @@ export class ManagePersonService {
     );
   }
 
-  private eventRemoveVisualContatoComponent(contato: Contato) {
+  eventRemoveVisualContatoComponent(contato: Contato) {
     this.contatos = this.contatos.filter((value, index, arr) => {
       return value !== contato;
     });

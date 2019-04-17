@@ -89,33 +89,30 @@ describe('ManagerPersonComponent', () => {
     expect(component.title).toEqual('Editar Pessoa');
   });
 
-  it('shouldn not save form with contatos with empty name ', done => {
+  it('shouldn not save form with contatos with empty name ', () => {
     component.fg.patchValue(mockPerson);
     component.appAddContatoComponent();
     expect(component.contatos.length).toBe(1);
 
-    component.save$().subscribe(() => {
-      expect(component.response.status).toEqual('warning');
-      expect(component.response.message).toEqual('Preencha o nome de todos os contatos');
-      done();
-    });
+    component.save();
+    fixture.detectChanges();
+    expect(component.response.status).toEqual('warning');
+    expect(component.response.message).toEqual('Preencha o nome de todos os contatos');
   });
 
-  it('should save a person with no contatos', done => {
+  it('should save a person with no contatos', () => {
     component.fg.patchValue(mockPerson);
-    component.save$().subscribe(() => {
-      expect(component.response.status).toBe('success');
-      done();
-    });
+    component.save();
+    fixture.detectChanges();
+    expect(component.response.status).toBe('success');
   });
 
-  it('should save a person with 1 new contatos', done => {
+  it('should save a person with 1 new contatos', () => {
     component.fg.patchValue(mockPerson);
     component.appAddContatoComponent(mockContato);
-    component.save$().subscribe(() => {
-      expect(component.response.status).toBe('success');
-      done();
-    });
+    component.save();
+    fixture.detectChanges();
+    expect(component.response.status).toBe('success');
   });
 
   it('should load the person from parameter id', done => {
@@ -134,10 +131,48 @@ describe('ManagerPersonComponent', () => {
   });
 
   it('should remove visual contato', () => {
-    /*component.appAddContatoComponent(mockContato);
+    component.appAddContatoComponent(mockContato);
     expect(component.contatos.length).toBe(1);
+    // confirm click to delete the contato
+    spyOn(window, 'confirm').and.returnValue(true);
     component.removeContato(mockContato);
-    expect(component.contatos.length).toBe(0);*/
+    expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
+    expect(component.contatos.length).toBe(0);
+  });
+
+  it('should remove contato from database and return 200', () => {
+    mockContato.id = 1;
+    component.appAddContatoComponent(mockContato);
+    expect(component.contatos.length).toBe(1);
+    // confirm click to delete the contato
+    spyOn(window, 'confirm').and.returnValue(true);
+    component.removeContato(mockContato);
+    expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
+    expect(component.contatos.length).toBe(0);
+    expect(component.response.status).toEqual('success');
+  });
+
+  it('should remove contato from database and return 404', () => {
+    mockContato.id = null;
+    component.appAddContatoComponent(mockContato);
+    expect(component.contatos.length).toBe(1);
+    // confirm click to delete the contato
+    spyOn(window, 'confirm').and.returnValue(true);
+    component.removeContato(mockContato);
+    expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
+    expect(component.contatos.length).toBe(1);
+    expect(component.response.status).toEqual('warning');
+  });
+
+  it('should remove cancel a contato removal', () => {
+    mockContato.id = 1;
+    component.appAddContatoComponent(mockContato);
+    expect(component.contatos.length).toBe(1);
+    // confirm click to delete the contato
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.removeContato(mockContato);
+    expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
+    expect(component.contatos.length).toBe(1);
   });
 
 });
