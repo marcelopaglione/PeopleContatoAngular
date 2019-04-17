@@ -5,7 +5,7 @@
     <form [formGroup]="fg" (ngSubmit)="save()">
       <div class="form-group">
         <label for="name">Nome</label>
-        <input
+        <input [ngClass]="{'is-invalid': !fg.get('name').valid && fg.get('name').touched}"
           type="text"
           class="form-control"
           id="name"
@@ -19,7 +19,7 @@
         <div class="form-row">
           <div class="col">
               <label for="rg">RG</label>
-              <input
+              <input [ngClass]="{'is-invalid': !fg.get('rg').valid && fg.get('rg').touched}"
                 type="text"
                 class="form-control"
                 id="rg"
@@ -31,6 +31,7 @@
               <label for="birthDate">Data de Nascimento</label>
               <div class="input-group">
                 <input class="form-control" placeholder="Selecione a data de nascimento"
+                    [ngClass]="{'is-invalid': !fg.get('birthDate').valid && fg.get('birthDate').touched}"
                     name="dp" formControlName="birthDate" ngbDatepicker #d="ngbDatepicker">
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
@@ -81,7 +82,7 @@
         <div class="form-row">
           <div class="col-11">
             <input
-              type="text"
+              type="text" [ngClass]="{'is-invalid': !item.name}"
               class="form-control"
               id="nome"
               [(ngModel)]="item.name"

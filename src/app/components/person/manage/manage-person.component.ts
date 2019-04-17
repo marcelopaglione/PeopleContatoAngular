@@ -30,8 +30,8 @@ export class ManagerPersonComponent implements OnInit {
   response = { message: '', status: '' };
   fg: FormGroup = this.formBuilder.group({
     id: [null],
-    name: [null, [Validators.required, Validators.min(3)]],
-    rg: [null, [Validators.required, Validators.min(8)]],
+    name: [null, [Validators.required, Validators.minLength(3)]],
+    rg: [null, [Validators.required, Validators.minLength(8)]],
     birthDate: [null, [Validators.required]]
   });
 
