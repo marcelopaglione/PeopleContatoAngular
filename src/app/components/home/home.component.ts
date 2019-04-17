@@ -28,17 +28,10 @@ export class HomeComponent implements OnInit {
     this.loadPeoplePaginatedFromDatabase();
   }
 
-  apiLoadPeoplePaginatedFromDatabase() {
-    return this.api.getPeople(this.page);
-  }
   loadPeoplePaginatedFromDatabase() {
-    this.apiLoadPeoplePaginatedFromDatabase().subscribe(paginatedPeople => {
-      this.setPaginatedDataIntoPeople(paginatedPeople);
+    this.api.getPeople(this.page).subscribe(paginatedPeople => {
+      this.page = paginatedPeople.body;
     });
-  }
-
-  setPaginatedDataIntoPeople(paginatedPeople: any) {
-    this.page = paginatedPeople.body;
   }
 
   editarPerson(personId: number) {
@@ -86,7 +79,7 @@ export class HomeComponent implements OnInit {
     this.apiGetPersonByNameContaining()
       .toPromise()
       .then(paginatedPeople => {
-        this.setPaginatedDataIntoPeople(paginatedPeople);
+        this.page = paginatedPeople.body;
       });
   }
 
@@ -99,7 +92,6 @@ export class HomeComponent implements OnInit {
   }
 
   reciverFeedbackFromPagination(feedback) {
-    console.log('Foi emitido >>>> ', feedback);
     this.page = feedback.page;
     this.updateListViewAtPage();
   }

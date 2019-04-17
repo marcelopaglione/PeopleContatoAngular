@@ -1,9 +1,5 @@
 <app-title title="Detalhes"></app-title>
 
-<div *ngIf="(allData$ | async) as person">
-  {{ person.name }}
-</div>
-
 <div *ngIf="(allData$ | async) as personContatos; else loading">
   <form>
     <ng-container
@@ -32,12 +28,12 @@
         input;
         context: {
           label: 'Data de Nascimento:',
-          value: personContatos.person.birthDate | date: 'dd/MMM/yyyy'
+          value: personContatos.person.birthDate | date: 'dd-MM-yyyy'
         }
       "
     ></ng-container>
 
-    <div *ngFor="let item of personContatos.contatos; let i = index">
+    <div *ngFor="let item of personContatos.contatos; index as i; trackBy: trackByFn">
       <ng-container
         *ngTemplateOutlet="
           input;

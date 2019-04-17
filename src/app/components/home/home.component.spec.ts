@@ -7,7 +7,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { RouterModule, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { By } from '@angular/platform-browser';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { Observable } from 'rxjs';
 import { Page } from 'src/app/Entities';
@@ -39,6 +38,11 @@ describe('HomeComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    jasmine.getEnv().addReporter({
+      specStarted(result) {
+        console.log(result.fullName);
+      }
+    });
   });
 
   it('should create', () => {

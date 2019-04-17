@@ -2,16 +2,8 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
-import { isUndefined, isNull } from 'util';
-import {
-  HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
-  HttpResponse,
-  HttpErrorResponse
-} from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { HttpResponse} from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -117,9 +109,7 @@ export class PeopleApiService {
     entity: PersonContatoEntity
   ): Observable<HttpResponse<any>> {
     if (
-      entity.person.id === 0 ||
-      isUndefined(entity.person.id) ||
-      isNull(entity.person.id)
+      !entity.person || !entity.person.id
     ) {
       return this.http.post<any>(
         `${this.API}contatos/savePersonAndContatos/`,
@@ -160,4 +150,5 @@ export class PeopleApiService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
   }
+
 }

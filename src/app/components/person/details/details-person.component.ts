@@ -56,4 +56,8 @@ export class DetailsPersonComponent implements OnInit {
   editPerson() {
     this.router.navigate([`person/${this.idFromUrlParam}`]);
   }
+
+  trackByFn(index: number) {
+    return index;
+  }
 }

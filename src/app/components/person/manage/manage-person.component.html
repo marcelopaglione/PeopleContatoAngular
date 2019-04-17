@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="container col-md-12">
-    <form [formGroup]="fg">
+    <form [formGroup]="fg" (ngSubmit)="save()">
       <div class="form-group">
         <label for="name">Nome</label>
         <input
@@ -16,25 +16,29 @@
       </div>
 
       <div class="form-group">
-        <label for="rg">RG</label>
-        <input
-          type="text"
-          class="form-control"
-          id="rg"
-          formControlName="rg"
-          placeholder="Ex: 498362371"
-        />
-      </div>
+        <div class="form-row">
+          <div class="col">
+              <label for="rg">RG</label>
+              <input
+                type="text"
+                class="form-control"
+                id="rg"
+                formControlName="rg"
+                placeholder="Ex: 498362371"
+              />
+          </div>
+          <div class="col">
+              <label for="birthDate">Data de Nascimento</label>
+              <div class="input-group">
+                <input class="form-control" placeholder="Selecione a data de nascimento"
+                    name="dp" formControlName="birthDate" ngbDatepicker #d="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
+                </div>
+              </div>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label for="birthDate">Data de Nascimento</label>
-        <input
-          type="text"
-          class="form-control"
-          id="birthDate"
-          formControlName="birthDate"
-          placeholder="dd/mm/yyyy"
-        />
       </div>
 
       <div class="">
@@ -47,7 +51,7 @@
               type="button"
               id="addNewContato"
               class="btn btn-info mr-2"
-              (click)="createComponent(null)"
+              (click)="appAddContatoComponent()"
               title="Adicionar Novo Contato"
             >
               <i class="fas fa-plus-circle"></i>
@@ -56,25 +60,49 @@
         </div>
         <hr />
 
-        <div *ngIf="componentsReferences.length === 0">
+        <div *ngIf="!contatos.length">
           <p>
             <i class="fas fa-exclamation-circle mr-3"></i>Adicione seu primeiro
             contato
           </p>
         </div>
+      </div>
 
-        <div>
-          <ng-template #viewContainerRef></ng-template>
-        </div>
-
-        <div>
-          <button class="btn btn-info mr-3" (click)="savePerson()" id="save">
-            Salvar
-          </button>
-          <button class="btn" (click)="navigateBack()">Voltar</button>
-        </div>
+      <div>
+        <button class="btn btn-info mr-3" type="submit" [disabled]="!fg.valid" id="save">
+          Salvar
+        </button>
+        <button class="btn" (click)="navigateBack()">Voltar</button>
       </div>
     </form>
+
+    <div *ngFor="let item of contatos">
+      <div class="mt-3 mb-3">
+        <div class="form-row">
+          <div class="col-11">
+            <input
+              type="text"
+              class="form-control"
+              id="nome"
+              [(ngModel)]="item.name"
+              placeholder="Informe o nome do contato {{item.name}}"
+            />
+          </div>
+          <div class="col-1 removeButton">
+            <button
+              class="btn btn-danger"
+              title="Remover contato"
+              (click)="removeContato(item)"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
   </div>
 </div>
 
