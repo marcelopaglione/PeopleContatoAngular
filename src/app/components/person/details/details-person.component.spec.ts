@@ -55,4 +55,8 @@ describe('DetailsPersonComponent', () => {
       done();
     });
   });
+
+  it('should have trackby', () => {
+    expect(component.trackByFn(1)).toEqual(1);
+  });
 });
