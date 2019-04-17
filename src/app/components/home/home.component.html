@@ -74,6 +74,7 @@
 <div class="myPagination d-flex justify-content-between">
   <app-pagination
     [page]="page"
+    [onPageLoad]="initPage"
     [searchString]="searchString"
     (eventChangeMaxItemsPerPage)="reciverFeedbackFromPagination($event)"
   ></app-pagination>

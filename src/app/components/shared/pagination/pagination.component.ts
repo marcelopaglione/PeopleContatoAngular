@@ -8,6 +8,7 @@ import { Page } from 'src/app/Entities';
 })
 export class PaginationComponent implements OnInit {
   inBetweenPages: number[] = [];
+  @Input() onPageLoad: EventEmitter<Page>;
   @Input() page: Page = {
     content: [],
     first: true,
@@ -25,7 +26,12 @@ export class PaginationComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    this.configureInBetweenPages();
+    if (this.onPageLoad) {
+      this.onPageLoad.subscribe((data: Page) => {
+        this.page = data;
+        this.configureInBetweenPages();
+      });
+    }
   }
 
   public nextPage() {
@@ -69,6 +75,7 @@ export class PaginationComponent implements OnInit {
   }
 
   private configureInBetweenPages() {
+    console.log('configureInBetweenPages');
     const curretPage = this.page.number + 1;
     const totalPages = this.page.totalPages;
     this.inBetweenPages = [];
