@@ -44,7 +44,7 @@
         <th scope="row">{{ item.id }}</th>
         <td>{{ item.name }}</td>
         <td>{{ item.rg }}</td>
-        <td>{{ item.birthDate}}</td>
+        <td>{{ item.birthDate | date: 'dd-MM-yyyy'}}</td>
         <td class="actionsOptions">
           <a
             class="btn btn-sm btn-warning mr-2"

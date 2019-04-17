@@ -42,7 +42,7 @@ describe('ManagerPersonComponent', () => {
     fixture = TestBed.createComponent(ManagerPersonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    mockPerson = {id: null, name: 'Nova Pessoa Full Name', rg: '1597534682', birthDate: '31/01/2015'};
+    mockPerson = {id: null, name: 'Person name', rg: '101010', birthDate: new Date('1500-01-31')};
     mockContato = {id: 0, name: 'Seu Aparecido', person: mockPerson};
     spyOn(component, 'ngOnInit').and.callThrough();
     component.ngOnInit();
@@ -115,13 +115,12 @@ describe('ManagerPersonComponent', () => {
     expect(component.response.status).toBe('success');
   });
 
-  it('should load the person from parameter id', done => {
+  it('should load the person from parameter id', () => {
     component.idFromUrlParam = 1;
-    component.loadPersonAndContatos().subscribe(data => {
-      expect(data.person.id).toBe(1);
-      expect(data.contatos.length).toBe(1);
-      done();
-    });
+    mockPerson.id = 1;
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.fg.value).toEqual(mockPerson);
   });
 
   it('should be able to navigate to `/home`', () => {

@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Person, Page } from 'src/app/Entities';
 import { Router } from '@angular/router';
-import { ManagePersonService } from '../person/manage/manage-person.service';
-import { HttpClient, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +9,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  constructor(private api: PeopleApiService, private router: Router, private service: ManagePersonService) {}
+  constructor(private api: PeopleApiService, private router: Router) {}
 
   searchString = '';
   page: Page = {
@@ -30,20 +28,10 @@ export class HomeComponent implements OnInit {
     this.loadPeoplePaginatedFromDatabase();
   }
 
-  apiLoadPeoplePaginatedFromDatabase() {
-    return this.api.getPeople(this.page);
-  }
   loadPeoplePaginatedFromDatabase() {
-    this.apiLoadPeoplePaginatedFromDatabase().subscribe(paginatedPeople => {
-      this.setPaginatedDataIntoPeople(paginatedPeople);
+    this.api.getPeople(this.page).subscribe(paginatedPeople => {
+      this.page = paginatedPeople.body;
     });
-  }
-
-  setPaginatedDataIntoPeople(paginatedPeople: HttpResponse<Page>) {
-    paginatedPeople.body.content.map(person => {
-      person.birthDate = this.service.formatDate(person.birthDate);
-    });
-    this.page = paginatedPeople.body;
   }
 
   editarPerson(personId: number) {
@@ -91,7 +79,7 @@ export class HomeComponent implements OnInit {
     this.apiGetPersonByNameContaining()
       .toPromise()
       .then(paginatedPeople => {
-        this.setPaginatedDataIntoPeople(paginatedPeople);
+        this.page = paginatedPeople.body;
       });
   }
 

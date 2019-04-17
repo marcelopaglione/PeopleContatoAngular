@@ -2,16 +2,8 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page, Person, Contato, PersonContatoEntity } from '../Entities';
-import { isUndefined, isNull, isNullOrUndefined } from 'util';
-import {
-  HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
-  HttpResponse,
-  HttpErrorResponse
-} from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { HttpResponse} from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -158,4 +150,5 @@ export class PeopleApiService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
   }
+
 }

@@ -12,6 +12,9 @@ import { HomeComponent } from './components/home/home.component';
 import { ManagerPersonComponent } from './components/person/manage/manage-person.component';
 import { PaginationComponent } from './components/shared/pagination/pagination.component';
 import { DetailsPersonComponent } from './components/person/details/details-person.component';
+import { NgbModule, NgbDateParserFormatter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { CustomDateParserFormatter } from './components/shared/forms/customDateParserFormatter';
+import { NgbStringAdapter } from './components/shared/forms/ngbStringAdapter';
 
 @NgModule({
   declarations: [
@@ -29,10 +32,13 @@ import { DetailsPersonComponent } from './components/person/details/details-pers
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [],
+  providers: [
+    { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
+    { provide: NgbDateAdapter, useClass: NgbStringAdapter }],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

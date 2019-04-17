@@ -1,17 +1,11 @@
-import {
-  Component,
-  OnInit,
-  AfterContentInit
-} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Contato,  PersonContatoEntity } from 'src/app/Entities';
 import { Router, ActivatedRoute } from '@angular/router';
 import { isNullOrUndefined } from 'util';
-import { ManagePersonService } from './manage-person.service';
 import { map } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
-import { dateValidator } from '../../shared/forms/date.validator';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-manage-person',
@@ -23,45 +17,23 @@ export class ManagerPersonComponent implements OnInit {
     private formBuilder: FormBuilder,
     private api: PeopleApiService,
     private activaedRoute: ActivatedRoute,
-    private router: Router,
-    private service: ManagePersonService
+    private router: Router
   ) {
     this.activaedRoute.params.subscribe(params => {
       this.idFromUrlParam = params.id;
     });
   }
 
-  get response() {
-    return this.service.response;
-  }
-
-  get contatosComponent() {
-    return this.service.contatos;
-  }
-
-  get contatos(): Contato[] {
-    return this.service.contatos;
-  }
-
   idFromUrlParam = 0;
   title: string;
-  contato: Contato[];
+  contatos: Contato[] = [];
+  response = { message: '', status: '' };
   fg: FormGroup = this.formBuilder.group({
     id: [null],
     name: [null, [Validators.required, Validators.min(3)]],
     rg: [null, [Validators.required, Validators.min(8)]],
-    birthDate: [null, [Validators.required, dateValidator()]]
+    birthDate: [null, [Validators.required]]
   });
-
-  person$ = this.api
-    .getPersonById(this.idFromUrlParam)
-    .pipe(map(data => {
-      data.body.birthDate = this.service.formatDate(data.body.birthDate);
-      return data.body;
-    }));
-  contatos$ = this.api
-    .getContatoByPersonId(this.idFromUrlParam)
-    .pipe(map(data => data.body));
 
   ngOnInit() {
     isNullOrUndefined(this.idFromUrlParam)
@@ -70,71 +42,90 @@ export class ManagerPersonComponent implements OnInit {
     this.initializePageContent();
   }
 
-  appAddContatoComponent(
-    inputContato: Contato = { name: null, id: 0, person: null }
-  ) {
-    this.service.appAddContatoComponent(inputContato);
+  appAddContatoComponent(inputContato: Contato = { name: null, id: 0, person: null }) {
+    this.contatos.push(inputContato);
   }
 
-  private initService() {
-    this.service.contatos = [];
-    this.service.response.status = '';
-    this.service.response.message = '';
+  eventRemoveContatoFromDatabase(contato: Contato) {
+    this.removeContatoFromDatabase(contato).subscribe();
+  }
+  removeContatoFromDatabase(contato: Contato): Observable<any> {
+    return this.api.deleteContatoById(contato.id).pipe(
+      map(data => {
+        if (data.status === 200) {
+          this.eventRemoveVisualContatoComponent(contato);
+          this.setResponse({
+            status: 'success',
+            message: 'Contato Removido com sucesso'
+          });
+        } else {
+          this.setResponse({
+            status: 'warning',
+            message:
+              'Não foi possível remover contato, Por favor tente novamente mais tarde'
+          });
+        }
+      })
+    );
+  }
+
+  eventRemoveVisualContatoComponent(contato: Contato) {
+    this.contatos = this.contatos.filter((value) => {
+      return value !== contato;
+    });
+  }
+
+  setResponse(event: { status: string; message: string }) {
+    this.response.message = event.message;
+    this.response.status = event.status;
+  }
+
+  isAllContatosValid() {
+    if (this.contatos.every(contato => !isNullOrUndefined(contato.name))) {
+      return true;
+    } else {
+      this.setResponse({
+        status: 'warning',
+        message: 'Preencha o nome de todos os contatos'
+      });
+      return false;
+    }
   }
 
   initializePageContent() {
-    this.initService();
     this.loadPerson();
     this.loadContatos();
   }
 
-  loadPerson() {
+  private loadPerson() {
     if (this.idFromUrlParam) {
       this.api
         .getPersonById(this.idFromUrlParam)
-        .toPromise()
-        .then(person => {
+        .subscribe(person => {
           this.fg.patchValue(person.body);
-          this.fg.patchValue({
-            birthDate: this.service.formatDate(person.body.birthDate.toString())
-          });
         });
     }
   }
 
-  loadContatos() {
+  private loadContatos() {
     if (this.idFromUrlParam) {
       this.api
         .getContatoByPersonId(this.idFromUrlParam)
-        .toPromise()
-        .then(contatos => {
+        .subscribe(contatos => {
           contatos.body.map(contato => {
-            this.service.appAddContatoComponent(contato);
+            this.appAddContatoComponent(contato);
           });
         });
-    }
-  }
-
-  loadPersonAndContatos(): Observable<PersonContatoEntity> {
-    if (this.idFromUrlParam) {
-      return combineLatest(this.person$, this.contatos$).pipe(
-        map(([p, c]) => {
-          return { person: p, contatos: c };
-        })
-      );
     }
   }
 
   private createEntityToPersist() {
-    const databaseDateFormat: string = this.service.toDatabaseDate(
-      this.fg.value.birthDate
-    );
     const entity: PersonContatoEntity = {
       contatos: this.contatos,
       person: {
         id: this.fg.value.id,
         name: this.fg.value.name,
-        birthDate: databaseDateFormat,
+        birthDate: this.fg.value.birthDate,
         rg: this.fg.value.rg
       }
     };
@@ -143,14 +134,14 @@ export class ManagerPersonComponent implements OnInit {
   }
 
   save() {
-    if (!this.service.isAllContatosValid()) {
+    if (!this.isAllContatosValid()) {
       return;
     }
     const entityToPersist = this.createEntityToPersist();
     return this.api.savePersonAndContato(entityToPersist).pipe(
       map(data => {
         if (data.status === 200 || data.status === 201) {
-          this.service.setResponse({
+          this.setResponse({
             status: 'success',
             message: `${this.fg.value.name} foi salvo com sucesso!`
           });
@@ -164,10 +155,10 @@ export class ManagerPersonComponent implements OnInit {
       return;
     }
     if (contato.id !== 0) {
-      this.service.eventRemoveContatoFromDatabase(contato);
+      this.eventRemoveContatoFromDatabase(contato);
       return;
     }
-    this.service.eventRemoveVisualContatoComponent(contato);
+    this.eventRemoveVisualContatoComponent(contato);
   }
 
   private dialogConfirmDeleteContaot(contato: Contato) {
