@@ -33,7 +33,7 @@
       "
     ></ng-container>
 
-    <div *ngFor="let item of personContatos.contatos; let i = index; trackByFn">
+    <div *ngFor="let item of personContatos.contatos; index as i; trackBy: trackByFn">
       <ng-container
         *ngTemplateOutlet="
           input;

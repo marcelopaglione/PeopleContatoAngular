@@ -20,21 +20,18 @@ export class ManagePersonService {
   }
 
   removeContato(contato: Contato) {
-    if (contato.id !== 0) {
-      if (!this.dialogConfirmDeleteContaot(contato)) {
-        return;
-      }
-      this.eventRemoveContatoFromDatabase(contato);
-    } else {
-      this.eventRemoveVisualContatoComponent(contato);
+    if (!this.dialogConfirmDeleteContaot(contato)) {
+      return;
     }
+    if (contato.id !== 0) {
+      this.eventRemoveContatoFromDatabase(contato);
+      return;
+    }
+    this.eventRemoveVisualContatoComponent(contato);
   }
 
   private dialogConfirmDeleteContaot(contato: Contato) {
-    if (!confirm(`Você tem certeza que deseja remover ${contato.name}`)) {
-      return true;
-    }
-    return false;
+    return confirm(`Você tem certeza que deseja remover ${contato.name}`);
   }
 
   eventRemoveContatoFromDatabase(contato: Contato) {

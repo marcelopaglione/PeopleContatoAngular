@@ -3,6 +3,7 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Person, Page } from 'src/app/Entities';
 import { Router } from '@angular/router';
 import { ManagePersonService } from '../person/manage/manage-person.service';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -38,7 +39,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  setPaginatedDataIntoPeople(paginatedPeople: any) {
+  setPaginatedDataIntoPeople(paginatedPeople: HttpResponse<Page>) {
     paginatedPeople.body.content.map(person => {
       person.birthDate = this.service.formatDate(person.birthDate);
     });

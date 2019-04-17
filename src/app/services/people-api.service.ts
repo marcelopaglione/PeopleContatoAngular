@@ -117,7 +117,7 @@ export class PeopleApiService {
     entity: PersonContatoEntity
   ): Observable<HttpResponse<any>> {
     if (
-      entity.person.id === 0 || isNullOrUndefined(entity.person.id)
+      !entity.person || !entity.person.id
     ) {
       return this.http.post<any>(
         `${this.API}contatos/savePersonAndContatos/`,
