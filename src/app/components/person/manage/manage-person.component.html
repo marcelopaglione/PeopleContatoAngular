@@ -6,11 +6,7 @@
       <div class="form-group">
         <label for="name">Nome</label>
         <input
-          [ngClass]="{
-            'validating': fg.get('name').status === 'PENDING',
-            'valid': fg.get('name').status === 'VALID',
-            'is-invalid': fg.get('name').status === 'INVALID' && fg.get('name').touched
-          }"
+          [ngClass]="{'is-invalid': !fg.get('name').valid && fg.get('name').touched}"
           type="text"
           class="form-control"
           id="name"
