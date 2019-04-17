@@ -138,16 +138,18 @@ export class ManagerPersonComponent implements OnInit {
       return;
     }
     const entityToPersist = this.createEntityToPersist();
-    return this.api.savePersonAndContato(entityToPersist).pipe(
-      map(data => {
+    return this.api.savePersonAndContato(entityToPersist)
+      .subscribe(data => {
         if (data.status === 200 || data.status === 201) {
           this.setResponse({
             status: 'success',
             message: `${this.fg.value.name} foi salvo com sucesso!`
           });
+          this.fg.reset();
+          this.contatos = [];
         }
-      })
-    ).subscribe();
+      });
+
   }
 
   removeContato(contato: Contato) {
