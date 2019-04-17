@@ -11,13 +11,14 @@ import { isNullOrUndefined } from 'util';
 import { ManagePersonService } from './manage-person.service';
 import { map } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
+import { dateValidator } from '../../shared/forms/date.validator';
 
 @Component({
   selector: 'app-manage-person',
   templateUrl: './manage-person.component.html',
   styleUrls: ['./manage-person.component.scss']
 })
-export class ManagerPersonComponent implements OnInit, AfterContentInit {
+export class ManagerPersonComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private api: PeopleApiService,
@@ -47,10 +48,11 @@ export class ManagerPersonComponent implements OnInit, AfterContentInit {
   contato: Contato[];
   fg: FormGroup = this.formBuilder.group({
     id: [null],
-    name: [null, Validators.required],
-    rg: [null, Validators.required],
-    birthDate: [null, Validators.required]
+    name: [null, [Validators.required, Validators.min(3)]],
+    rg: [null, [Validators.required, Validators.min(8)]],
+    birthDate: [null, [Validators.required, dateValidator()]]
   });
+
   person$ = this.api
     .getPersonById(this.idFromUrlParam)
     .pipe(map(data => {
@@ -67,8 +69,6 @@ export class ManagerPersonComponent implements OnInit, AfterContentInit {
       : (this.title = 'Editar Pessoa');
     this.initializePageContent();
   }
-
-  ngAfterContentInit(): void {}
 
   appAddContatoComponent(
     inputContato: Contato = { name: null, id: 0, person: null }
@@ -142,12 +142,8 @@ export class ManagerPersonComponent implements OnInit, AfterContentInit {
     return entity;
   }
 
-  save() {
-    this.savePerson().subscribe();
-  }
-
-  savePerson(): Observable<any> {
-    if (!this.service.isValidFormToSubmit(this.fg)) {
+  save$() {
+    if (!this.service.isAllContatosValid()) {
       return of('');
     }
     const entityToPersist = this.createEntityToPersist();

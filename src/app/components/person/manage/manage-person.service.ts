@@ -81,48 +81,7 @@ export class ManagePersonService {
     return `${year}-${month}-${day}`;
   }
 
-  validateDate(date: string): boolean {
-    const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
-    if (!dateRegex.test(date)) {
-      return false;
-    }
-    return true;
-  }
-
-  isValidFormToSubmit(fg: FormGroup) {
-    if (
-      this.ifFormGroupInvalid(fg) ||
-      this.isBirthDateInvalid(fg.value.birthDate) ||
-      !this.isAllContatosValid()
-    ) {
-      return false;
-    }
-    return true;
-  }
-
-  private isBirthDateInvalid(birthDate: string) {
-    if (!this.validateDate(birthDate)) {
-      this.setResponse({
-        status: 'warning',
-        message: 'Data de nascimento está inválida'
-      });
-      return true;
-    }
-    return false;
-  }
-
-  private ifFormGroupInvalid(fg: FormGroup) {
-    if (!fg.valid) {
-      this.setResponse({
-        status: 'warning',
-        message: 'Formulário inválido'
-      });
-      return true;
-    }
-    return false;
-  }
-
-  private isAllContatosValid() {
+  isAllContatosValid() {
     if (this.contatos.every(contato => !isNullOrUndefined(contato.name))) {
       return true;
     } else {
