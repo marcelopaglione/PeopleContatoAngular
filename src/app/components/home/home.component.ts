@@ -34,9 +34,7 @@ export class HomeComponent implements OnInit {
     this.api.getPeople(this.page)
     .pipe(map(data => data.body))
     .subscribe(paginatedPeople => {
-      if (this.page.empty) {
-        this.initPage.emit(paginatedPeople);
-      }
+      this.initPage.emit(paginatedPeople);
       this.page = paginatedPeople;
     });
   }
@@ -73,7 +71,10 @@ export class HomeComponent implements OnInit {
     this.api
       .getPersonByNameContaining(this.searchString, this.page)
       .pipe(map(data => data.body))
-      .subscribe(body => this.page = body);
+      .subscribe(body => {
+        this.page = body;
+        this.initPage.emit(body);
+      });
   }
 
   reciverFeedbackFromPagination(feedback: { page: Page; }) {

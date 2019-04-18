@@ -75,35 +75,38 @@ export class PaginationComponent implements OnInit {
   }
 
   private configureInBetweenPages() {
-    console.log('configureInBetweenPages');
-    const curretPage = this.page.number + 1;
     const totalPages = this.page.totalPages;
+    let curretPage;
+    let updatePage = false;
+    if (this.page.number + 1 > totalPages) {
+      curretPage = totalPages - 1;
+      this.page.number = curretPage;
+      updatePage = true;
+    } else {
+      curretPage = this.page.number + 1;
+    }
     this.inBetweenPages = [];
+    const subpages = [1, 2, 5, 10];
+    for (let i = subpages.length - 1; i >= 0; i--) {
+      this.addNegativeSubPage(curretPage, subpages[i]);
+    }
+    if (curretPage <= totalPages && curretPage > 0) { this.inBetweenPages.push(curretPage); }
+    for (const subpage of subpages) {
+      this.addPositiveSubPage(curretPage, subpage, totalPages);
+    }
 
-    if (curretPage > 10) {
-      this.inBetweenPages.push(curretPage - 10);
+    if (updatePage) {
+      if (curretPage >= 0) {
+        this.updateListViewAtPage();
+      }
     }
-    if (curretPage > 5) {
-      this.inBetweenPages.push(curretPage - 5);
-    }
-    if (curretPage > 2) {
-      this.inBetweenPages.push(curretPage - 2);
-    }
-    if (curretPage > 1) {
-      this.inBetweenPages.push(curretPage - 1);
-    }
-    this.inBetweenPages.push(curretPage);
-    if (curretPage + 1 <= totalPages) {
-      this.inBetweenPages.push(curretPage + 1);
-    }
-    if (curretPage + 2 <= totalPages) {
-      this.inBetweenPages.push(curretPage + 2);
-    }
-    if (curretPage + 5 <= totalPages) {
-      this.inBetweenPages.push(curretPage + 5);
-    }
-    if (curretPage + 10 <= totalPages) {
-      this.inBetweenPages.push(curretPage + 10);
-    }
+  }
+
+  private addPositiveSubPage(curretPage: number, subPage: number, totalPages: number) {
+    if (curretPage + subPage <= totalPages && curretPage > 0) { this.inBetweenPages.push(curretPage + subPage); }
+  }
+
+  private addNegativeSubPage(curretPage: number, subPage: number) {
+    if (curretPage > subPage && curretPage > 0) { this.inBetweenPages.push(curretPage - subPage); }
   }
 }
