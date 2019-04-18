@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { PersonContatoEntity, Page } from '../Entities';
 import { HttpResponse } from '@angular/common/http';
-import { isUndefined, isNull, isNullOrUndefined } from 'util';
+import { isUndefined, isNull } from 'util';
 
 export class MockPeopleApiService {
 
@@ -58,25 +58,6 @@ export class MockPeopleApiService {
     );
   }
 
-  public getPersonByExactName(name: string, page: Page): Observable<HttpResponse<Page>> {
-    page.content = [
-        {
-          id: 1,
-          name: `Person ${name}`,
-          rg: '101010',
-          birthDate: new Date(2018, 1, 31)
-        }
-    ];
-
-    return of (
-      new HttpResponse( {
-        status: 200,
-        body: page
-      })
-    );
-  }
-
-
   getContatoByPersonId(): Observable<any> {
     return of({
       body: [
@@ -104,19 +85,13 @@ export class MockPeopleApiService {
     });
   }
   public deleteContatoById(id: number): Observable<HttpResponse<any>> {
-    if (!isNullOrUndefined(id)) {
+    if (id) {
       return of(new HttpResponse( {
         status: 200
       }));
-    } else {
-      return of(new HttpResponse( {
-        status: 404
-      }));
     }
   }
-  public savePersonAndContato(
-    entity: PersonContatoEntity
-  ): Observable<HttpResponse<any>> {
+  public savePersonAndContato(entity: PersonContatoEntity): Observable<HttpResponse<any>> {
     if (
       entity.person.id === 0 ||
       isUndefined(entity.person.id) ||
@@ -124,13 +99,21 @@ export class MockPeopleApiService {
     ) {
       return of(new HttpResponse(
         {
-          status: 201
+          status: 201,
+          body: {
+            person: entity.person,
+            contatos: entity.contatos
+          }
         }
       ));
     } else {
       return of(new HttpResponse(
         {
-          status: 200
+          status: 200,
+          body: {
+            person: entity.person,
+            contatos: entity.contatos
+          }
         }
       ));
     }

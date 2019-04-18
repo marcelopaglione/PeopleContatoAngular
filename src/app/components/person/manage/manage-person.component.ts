@@ -1,11 +1,11 @@
 import { Component, OnInit} from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AsyncValidatorFn, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AsyncValidatorFn, FormControl, FormArray } from '@angular/forms';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Contato,  PersonContatoEntity, Page } from 'src/app/Entities';
 import { Router, ActivatedRoute } from '@angular/router';
-import { isNullOrUndefined } from 'util';
 import { map, tap, delay, distinctUntilChanged } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+
 
 @Component({
   selector: 'app-manage-person',
@@ -24,100 +24,59 @@ export class ManagerPersonComponent implements OnInit {
     });
   }
 
-  idFromUrlParam = 0;
+  idFromUrlParam = null;
   title: string;
-  contatos: Contato[] = [];
   response = { message: '', status: '' };
   fg: FormGroup;
 
   ngOnInit() {
-    isNullOrUndefined(this.idFromUrlParam)
-      ? (this.title = 'Cadastrar Nova Pessoa')
-      : (this.title = 'Editar Pessoa');
+    this.idFromUrlParam ? this.title = 'Editar Pessoa' : this.title = 'Cadastrar Nova Pessoa';
 
     this.fg = this.formBuilder.group({
-        id: [null],
-        name: [null, [Validators.required, Validators.minLength(3)], [this.validateNameExistsOnDatabase.bind(this)]],
-        rg: [null, [Validators.required, Validators.minLength(8)]],
-        birthDate: [null, [Validators.required]]
+        person: this.formBuilder.group({
+          id: [null],
+          name: [null, [Validators.required, Validators.minLength(3)]],
+          rg: [null, [Validators.required, Validators.minLength(8)]],
+          birthDate: [null, [Validators.required]],
+        }),
+        contatos: this.formBuilder.array([])
       });
+
     this.initializePageContent();
   }
 
-  validateNameExistsOnDatabase(fg: FormGroup) {
-    const page: Page = {
-      content: [],
-      first: true,
-      last: false,
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-      size: 5,
-      numberOfElements: 0,
-      empty: true
-    };
-    return this.api
-    .getPersonByExactName(fg.value, page)
-    .pipe(
-      distinctUntilChanged(),
-      delay(2000),
-      map(data => data.body),
-      // tap(data => console.log(1, data)),
-      map(data => data.content),
-      // tap(data => console.log(data)),
-      map(data => data.length > 0 ? { userAlredyExists: true } : {}),
-      // tap(console.log),
-    );
+  get contatos(): FormArray { return this.fg.get('contatos') as FormArray; }
+  get person(): FormGroup { return this.fg.get('person') as FormGroup; }
+
+  appAddContatoComponent(inputContato?: Contato) {
+    const form = this.formBuilder.group({
+      name: [null, [Validators.required, Validators.minLength(3)]],
+      id: [null],
+      person: [null]
+    });
+    if (inputContato) { form.patchValue(inputContato); }
+
+    this.contatos.push(form);
   }
 
-  appAddContatoComponent(inputContato: Contato = { name: null, id: 0, person: null }) {
-    this.contatos.push(inputContato);
-  }
-
-  eventRemoveContatoFromDatabase(contato: Contato) {
-    this.removeContatoFromDatabase(contato).subscribe();
-  }
-  removeContatoFromDatabase(contato: Contato): Observable<any> {
-    return this.api.deleteContatoById(contato.id).pipe(
+  removeContatoFromDatabase(contato: Contato, index: number) {
+    this.api.deleteContatoById(contato.id).pipe(
       map(data => {
         if (data.status === 200) {
-          this.eventRemoveVisualContatoComponent(contato);
-          this.setResponse({
-            status: 'success',
-            message: 'Contato Removido com sucesso'
-          });
-        } else {
-          this.setResponse({
-            status: 'warning',
-            message:
-              'Não foi possível remover contato, Por favor tente novamente mais tarde'
-          });
+          this.eventRemoveVisualContatoComponent(index);
+          this.setResponse({ status: 'success', message: 'Contato Removido com sucesso' });
         }
       })
-    );
+    ).subscribe();
   }
 
-  eventRemoveVisualContatoComponent(contato: Contato) {
-    this.contatos = this.contatos.filter((value) => {
-      return value !== contato;
-    });
+  eventRemoveVisualContatoComponent(index: number) {
+    this.contatos.removeAt(index);
   }
 
   setResponse(event: { status: string; message: string }) {
     this.response.message = event.message;
     this.response.status = event.status;
-  }
-
-  isAllContatosValid() {
-    if (this.contatos.every(contato => !isNullOrUndefined(contato.name))) {
-      return true;
-    } else {
-      this.setResponse({
-        status: 'warning',
-        message: 'Preencha o nome de todos os contatos'
-      });
-      return false;
-    }
   }
 
   initializePageContent() {
@@ -130,7 +89,7 @@ export class ManagerPersonComponent implements OnInit {
       this.api
         .getPersonById(this.idFromUrlParam)
         .subscribe(person => {
-          this.fg.patchValue(person.body);
+          this.person.patchValue(person.body);
         });
     }
   }
@@ -147,48 +106,39 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-  private createEntityToPersist() {
-    const entity: PersonContatoEntity = {
-      contatos: this.contatos,
-      person: {
-        id: this.fg.value.id,
-        name: this.fg.value.name,
-        birthDate: this.fg.value.birthDate,
-        rg: this.fg.value.rg
-      }
-    };
-    entity.contatos.map(c => (c.person = entity.person));
-    return entity;
+  private updatePersonFromContatos() {
+    for (const control of this.contatos.controls) {
+      control.patchValue({person: this.person.value});
+    }
   }
 
   save() {
-    if (!this.isAllContatosValid()) {
-      return;
-    }
-    const entityToPersist = this.createEntityToPersist();
-    return this.api.savePersonAndContato(entityToPersist)
-      .subscribe(data => {
+    if (!this.fg.valid) { return; }
+    this.updatePersonFromContatos();
+    return this.api.savePersonAndContato(this.fg.value).pipe(
+      map(data => {
         if (data.status === 200 || data.status === 201) {
-          this.setResponse({
-            status: 'success',
-            message: `${this.fg.value.name} foi salvo com sucesso!`
-          });
-          this.fg.reset();
-          this.contatos = [];
+          this.setResponse({ status: 'success', message: `${this.person.value.name} foi salvo com sucesso!` });
         }
+        return data.body;
+      }),
+      tap(console.log))
+      .subscribe(data => {
+        this.fg.patchValue(data);
       });
-
   }
 
-  removeContato(contato: Contato) {
-    if (!this.dialogConfirmDeleteContaot(contato)) {
+  removeContato(contatoFormArrayIndex: number) {
+    const form = this.contatos.controls[contatoFormArrayIndex];
+    if ( !form.value.id ) {
+      this.eventRemoveVisualContatoComponent(contatoFormArrayIndex);
       return;
     }
-    if (contato.id !== 0) {
-      this.eventRemoveContatoFromDatabase(contato);
+
+    if (!this.dialogConfirmDeleteContaot(form.value)) {
       return;
     }
-    this.eventRemoveVisualContatoComponent(contato);
+    this.removeContatoFromDatabase(form.value, contatoFormArrayIndex);
   }
 
   private dialogConfirmDeleteContaot(contato: Contato) {

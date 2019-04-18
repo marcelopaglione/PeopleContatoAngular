@@ -11,6 +11,8 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
 import { Person, Contato } from 'src/app/Entities';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbStringAdapter } from '../../shared/forms/ngbStringAdapter';
+import { CustomDateParserFormatter } from '../../shared/forms/customDateParserFormatter';
 describe('ManagerPersonComponent', () => {
   let component: ManagerPersonComponent;
   let fixture: ComponentFixture<ManagerPersonComponent>;
@@ -43,8 +45,8 @@ describe('ManagerPersonComponent', () => {
     fixture = TestBed.createComponent(ManagerPersonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    mockPerson = {id: null, name: 'Person name', rg: '101010', birthDate: new Date('1500-01-31')};
-    mockContato = {id: 0, name: 'Seu Aparecido', person: mockPerson};
+    mockPerson = {id: null, name: 'Person name', rg: '10101010', birthDate: new Date(2019, 12, 31)};
+    mockContato = {id: null, name: 'Seu Aparecido', person: mockPerson};
     spyOn(component, 'ngOnInit').and.callThrough();
     component.ngOnInit();
 
@@ -78,12 +80,6 @@ describe('ManagerPersonComponent', () => {
     expect(component.fg.valid).toBeFalsy();
   });
 
-  it('shouldn not save form with invalid birthDate', () => {
-    component.fg.patchValue(mockPerson);
-    component.fg.patchValue({ birthDate: '12/31/2015' });
-    expect(component.fg.valid).toBeFalsy();
-  });
-
   it('should set title to edit person when page receive a id parameter', () => {
     component.idFromUrlParam  = 1;
     component.ngOnInit();
@@ -91,26 +87,33 @@ describe('ManagerPersonComponent', () => {
   });
 
   it('shouldn not save form with contatos with empty name ', () => {
+    mockPerson.name = '';
     component.fg.patchValue(mockPerson);
     component.appAddContatoComponent();
     expect(component.contatos.length).toBe(1);
 
     component.save();
     fixture.detectChanges();
-    expect(component.response.status).toEqual('warning');
-    expect(component.response.message).toEqual('Preencha o nome de todos os contatos');
+    expect(component.response.status).toEqual('');
   });
 
   it('should save a person with no contatos', () => {
-    component.fg.patchValue(mockPerson);
+    patchPersonFormGroup(component, mockPerson);
+    fixture.detectChanges();
     component.save();
     fixture.detectChanges();
     expect(component.response.status).toBe('success');
   });
 
   it('should save a person with 1 new contatos', () => {
-    component.fg.patchValue(mockPerson);
+    mockPerson.id = 0;
+    patchPersonFormGroup(component, mockPerson);
+    expect(component.fg.valid).toBeTruthy();
+
+    mockContato.id = 0;
     component.appAddContatoComponent(mockContato);
+    expect(component.fg.valid).toBeTruthy();
+
     component.save();
     fixture.detectChanges();
     expect(component.response.status).toBe('success');
@@ -118,8 +121,11 @@ describe('ManagerPersonComponent', () => {
 
   it('should update a person with 1 contato', () => {
     mockPerson.id = 14;
-    component.fg.patchValue(mockPerson);
+    patchPersonFormGroup(component, mockPerson);
+    fixture.detectChanges();
     component.appAddContatoComponent(mockContato);
+    expect(component.fg.valid).toBeTruthy();
+    fixture.detectChanges();
     component.save();
     fixture.detectChanges();
     expect(component.response.status).toBe('success');
@@ -130,8 +136,8 @@ describe('ManagerPersonComponent', () => {
     mockPerson.id = 1;
     component.ngOnInit();
     fixture.detectChanges();
-    expect(component.fg.value.id).toEqual(mockPerson.id);
-    expect(component.fg.value.name).toEqual(mockPerson.name);
+    expect(component.fg.get('person').value.id).toEqual(mockPerson.id);
+    expect(component.fg.get('person').value.name).toEqual(mockPerson.name);
   });
 
   it('should be able to navigate to `/home`', () => {
@@ -141,11 +147,12 @@ describe('ManagerPersonComponent', () => {
   });
 
   it('should remove visual contato', () => {
+    mockContato.id = 15;
     component.appAddContatoComponent(mockContato);
     expect(component.contatos.length).toBe(1);
     // confirm click to delete the contato
     spyOn(window, 'confirm').and.returnValue(true);
-    component.removeContato(mockContato);
+    component.removeContato(component.contatos.length - 1);
     expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
     expect(component.contatos.length).toBe(0);
   });
@@ -156,22 +163,19 @@ describe('ManagerPersonComponent', () => {
     expect(component.contatos.length).toBe(1);
     // confirm click to delete the contato
     spyOn(window, 'confirm').and.returnValue(true);
-    component.removeContato(mockContato);
+    component.removeContato(component.contatos.length - 1);
     expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
     expect(component.contatos.length).toBe(0);
     expect(component.response.status).toEqual('success');
   });
 
-  it('should remove contato from database and return 404', () => {
+  it('should remove contato from whit empty id with no confirm question', () => {
     mockContato.id = null;
     component.appAddContatoComponent(mockContato);
     expect(component.contatos.length).toBe(1);
-    // confirm click to delete the contato
-    spyOn(window, 'confirm').and.returnValue(true);
-    component.removeContato(mockContato);
-    expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
-    expect(component.contatos.length).toBe(1);
-    expect(component.response.status).toEqual('warning');
+    component.removeContato(component.contatos.length - 1);
+    expect(component.contatos.length).toBe(0);
+    expect(component.response.status).toEqual('');
   });
 
   it('should remove cancel a contato removal', () => {
@@ -180,9 +184,37 @@ describe('ManagerPersonComponent', () => {
     expect(component.contatos.length).toBe(1);
     // confirm click to delete the contato
     spyOn(window, 'confirm').and.returnValue(false);
-    component.removeContato(mockContato);
+    component.removeContato(component.contatos.length - 1);
     expect(window.confirm).toHaveBeenCalledWith(`Você tem certeza que deseja remover ${mockContato.name}`);
     expect(component.contatos.length).toBe(1);
   });
 
+  it('should convert Date to datepicker', () => {
+    // date = dd-(mm-1)-yyyy
+    const date = new Date(2019, 0, 1);
+    const datepickerFormat = {year: 2019, month: 1, day: 1};
+    const dateString = '01-01-2019';
+
+    const datePickerFormatter = new NgbStringAdapter();
+    const customDateParser = new CustomDateParserFormatter();
+
+    expect(customDateParser.format(datepickerFormat)).toEqual(dateString);
+    expect(customDateParser.parse(dateString)).toEqual(datepickerFormat);
+    expect(customDateParser.format(null)).toEqual(null);
+    expect(customDateParser.parse(null)).toEqual(null);
+
+    expect(datePickerFormatter.fromModel(date)).toEqual(datepickerFormat);
+    expect(datePickerFormatter.toModel(datepickerFormat)).toEqual(date);
+    expect(datePickerFormatter.fromModel(null)).toEqual(null);
+    expect(datePickerFormatter.toModel(null)).toEqual(null);
+
+  });
+
+
+
 });
+function patchPersonFormGroup(component: ManagerPersonComponent, mockPerson: Person) {
+  component.fg.patchValue({person: mockPerson});
+  component.fg.patchValue({person: {birthDate: new NgbStringAdapter().fromModel(component.fg.get('person').get('birthDate').value)}});
+}
+
