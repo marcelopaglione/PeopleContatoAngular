@@ -54,7 +54,6 @@ export class ManagerPersonComponent implements OnInit {
       id: [null],
       person: [null]
     });
-    console.log('patch contato', inputContato);
     if (inputContato) { form.patchValue(inputContato); }
 
     this.contatos.push(form);
