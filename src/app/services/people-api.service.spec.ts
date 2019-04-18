@@ -123,6 +123,24 @@ describe('PeopleApiService', () => {
     )
   ));
 
+  it('should call getPersonByExactName from the api http service', fakeAsync(
+    inject([PeopleApiService, HttpTestingController], (api: PeopleApiService, backend: HttpTestingController) => {
+        const responseObject = { success: true, message: 'success' };
+        let response = null;
+        const name = 'searchString';
+        api.getPersonByExactName(name, page).subscribe( (receivedResponse: any) => { response = receivedResponse; });
+        const requestWrapper = backend.expectOne({ url:
+          `${API}people/findByExactName/${name}?size=${page.size}&page=${page.number}`
+        });
+        requestWrapper.flush(responseObject);
+        tick();
+        expect(requestWrapper.request.method).toEqual('GET');
+        expect(response.body).toEqual(responseObject);
+        expect(response.status).toBe(200);
+      }
+    )
+  ));
+
   it('should call getContatoByNameContaining from the api http service', fakeAsync(
     inject([PeopleApiService, HttpTestingController], (api: PeopleApiService, backend: HttpTestingController) => {
         const responseObject = { success: true, message: 'success' };

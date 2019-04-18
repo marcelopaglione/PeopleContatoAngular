@@ -62,6 +62,21 @@ export class PeopleApiService {
     );
   }
 
+  public getPersonByExactName(
+    name: string,
+    page: Page
+  ): Observable<HttpResponse<Page>> {
+    return this.http.get<Page>(
+      `${this.API}people/findByExactName/${name}?size=${page.size}&page=${
+        page.number
+      }`,
+      {
+        headers: this.getHeaders(),
+        observe: 'response'
+      }
+    );
+  }
+
   public getContatoByNameContaining(name: string): any {
     return this.http.get<any>(`${this.API}contatos/findByName/${name}`, {
       headers: this.getHeaders(),
