@@ -15,6 +15,7 @@ import { DetailsPersonComponent } from './components/person/details/details-pers
 import { NgbModule, NgbDateParserFormatter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { CustomDateParserFormatter } from './components/shared/forms/customDateParserFormatter';
 import { NgbStringAdapter } from './components/shared/forms/ngbStringAdapter';
+import { InputComponent } from './components/shared/forms/input/input.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { NgbStringAdapter } from './components/shared/forms/ngbStringAdapter';
     AlertComponent,
     HomeComponent,
     DetailsPersonComponent,
-    PaginationComponent
+    PaginationComponent,
+    InputComponent
   ],
   imports: [
     BrowserModule,

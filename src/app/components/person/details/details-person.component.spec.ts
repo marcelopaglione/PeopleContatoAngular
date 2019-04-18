@@ -7,6 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { PeopleApiService } from 'src/app/services/people-api.service';
 import { MockPeopleApiService } from 'src/app/services/MockPeopleApiService';
+import { InputComponent } from '../../shared/forms/input/input.component';
 
 describe('DetailsPersonComponent', () => {
   let component: DetailsPersonComponent;
@@ -16,7 +17,7 @@ describe('DetailsPersonComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientModule, RouterModule],
-      declarations: [DetailsPersonComponent, TitleComponent],
+      declarations: [DetailsPersonComponent, TitleComponent, InputComponent],
       providers: [{ provide: PeopleApiService, useClass: MockPeopleApiService }]
     }).compileComponents();
     router = TestBed.get(Router);

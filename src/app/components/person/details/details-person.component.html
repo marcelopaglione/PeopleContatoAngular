@@ -2,44 +2,13 @@
 
 <div *ngIf="(allData$ | async) as personContatos; else loading">
   <form>
-    <ng-container
-      *ngTemplateOutlet="
-        input;
-        context: { label: 'ID:', value: personContatos.person.id }
-      "
-    ></ng-container>
-
-    <ng-container
-      *ngTemplateOutlet="
-        input;
-        context: { label: 'Name:', value: personContatos.person.name }
-      "
-    ></ng-container>
-
-    <ng-container
-      *ngTemplateOutlet="
-        input;
-        context: { label: 'RG:', value: personContatos.person.rg }
-      "
-    ></ng-container>
-
-    <ng-container
-      *ngTemplateOutlet="
-        input;
-        context: {
-          label: 'Data de Nascimento:',
-          value: personContatos.person.birthDate | date: 'dd-MM-yyyy'
-        }
-      "
-    ></ng-container>
+    <app-input label="ID:" [value]="personContatos.person.id" [disabled]="true"></app-input>
+    <app-input label="Name:" [value]="personContatos.person.name" [disabled]="true"></app-input>
+    <app-input label="RG:" [value]="personContatos.person.rg" [disabled]="true"></app-input>
+    <app-input label="Data de Nascimento:" [value]="personContatos.person.birthDate | date: 'dd-MM-yyyy'" [disabled]="true"></app-input>
 
     <div *ngFor="let item of personContatos.contatos; index as i; trackBy: trackByFn">
-      <ng-container
-        *ngTemplateOutlet="
-          input;
-          context: { label: 'Contato ' + (i + 1), value: item.name }
-        "
-      ></ng-container>
+      <app-input [label]="'Contato ' + (i + 1) + ':'" [value]="item.name" [disabled]="true"></app-input>
     </div>
 
     <button class="btn btn-info mr-3" (click)="editPerson()">Editar</button>
