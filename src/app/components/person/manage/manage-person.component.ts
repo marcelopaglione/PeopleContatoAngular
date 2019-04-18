@@ -4,7 +4,7 @@ import { PeopleApiService } from 'src/app/services/people-api.service';
 import { Contato,  PersonContatoEntity, Page } from 'src/app/Entities';
 import { Router, ActivatedRoute } from '@angular/router';
 import { isNullOrUndefined } from 'util';
-import { map, tap, delay } from 'rxjs/operators';
+import { map, tap, delay, distinctUntilChanged } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
 @Component({
@@ -37,14 +37,14 @@ export class ManagerPersonComponent implements OnInit {
 
     this.fg = this.formBuilder.group({
         id: [null],
-        name: [null, [Validators.required, Validators.minLength(3)], [this.validDateNameExistsOnDatabase.bind(this)]],
+        name: [null, [Validators.required, Validators.minLength(3)], [this.validateNameExistsOnDatabase.bind(this)]],
         rg: [null, [Validators.required, Validators.minLength(8)]],
         birthDate: [null, [Validators.required]]
       });
     this.initializePageContent();
   }
 
-  validDateNameExistsOnDatabase(fg: FormControl) {
+  validateNameExistsOnDatabase(fg: FormGroup) {
     const page: Page = {
       content: [],
       first: true,
@@ -57,15 +57,16 @@ export class ManagerPersonComponent implements OnInit {
       empty: true
     };
     return this.api
-    .getPersonByNameContaining(this.fg.value.name, page)
+    .getPersonByExactName(fg.value, page)
     .pipe(
+      distinctUntilChanged(),
       delay(2000),
       map(data => data.body),
-       tap(data => console.log(1, data)),
+      // tap(data => console.log(1, data)),
       map(data => data.content),
-       tap(data => console.log(data)),
+      // tap(data => console.log(data)),
       map(data => data.length > 0 ? { userAlredyExists: true } : {}),
-       tap(console.log),
+      // tap(console.log),
     );
   }
 
