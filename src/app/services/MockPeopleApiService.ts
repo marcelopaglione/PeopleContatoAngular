@@ -58,25 +58,6 @@ export class MockPeopleApiService {
     );
   }
 
-  public getPersonByExactName(name: string, page: Page): Observable<HttpResponse<Page>> {
-    page.content = [
-        {
-          id: 1,
-          name: `Person ${name}`,
-          rg: '101010',
-          birthDate: new Date(2018, 1, 31)
-        }
-    ];
-
-    return of (
-      new HttpResponse( {
-        status: 200,
-        body: page
-      })
-    );
-  }
-
-
   getContatoByPersonId(): Observable<any> {
     return of({
       body: [
@@ -104,13 +85,9 @@ export class MockPeopleApiService {
     });
   }
   public deleteContatoById(id: number): Observable<HttpResponse<any>> {
-    if (!isNullOrUndefined(id)) {
+    if (id) {
       return of(new HttpResponse( {
         status: 200
-      }));
-    } else {
-      return of(new HttpResponse( {
-        status: 404
       }));
     }
   }

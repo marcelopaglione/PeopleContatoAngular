@@ -8,7 +8,6 @@
         <input
           [ngClass]="{
             'validating': fg.get('name').status === 'PENDING',
-            'valid': fg.get('name').status === 'VALID',
             'is-invalid': fg.get('name').status === 'INVALID' && fg.get('name').touched
           }"
           type="text"
@@ -66,12 +65,39 @@
         </div>
         <hr />
 
-        <div *ngIf="!contatos.length">
+        <div *ngIf="!items">
           <p>
             <i class="fas fa-exclamation-circle mr-3"></i>Adicione seu primeiro
             contato
           </p>
         </div>
+      </div>
+
+      <div formArrayName="contatos" *ngFor="let item of contatos['controls']; let i = index;">
+          <div class="mt-3 mb-3" [formGroupName]="i">
+              <div class="form-row">
+                <div class="col-11">
+                  <input
+                    [ngClass]="{'is-invalid': !item.get('name').valid && item.get('name').touched}"
+                    type="text"
+                    class="form-control"
+                    id="nome"
+                    formControlName="name"
+                    placeholder="Informe o nome do contato"
+                  />
+                </div>
+                <div class="col-1 removeButton">
+                  <button
+                    (click)="removeContato(i)"
+                    class="btn btn-danger"
+                    title="Remover contato"
+                    type="button"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
       </div>
 
       <div>
@@ -81,31 +107,6 @@
         <button class="btn" (click)="navigateBack()">Voltar</button>
       </div>
     </form>
-
-    <div *ngFor="let item of contatos">
-      <div class="mt-3 mb-3">
-        <div class="form-row">
-          <div class="col-11">
-            <input
-              type="text" [ngClass]="{'is-invalid': !item.name}"
-              class="form-control"
-              id="nome"
-              [(ngModel)]="item.name"
-              placeholder="Informe o nome do contato {{item.name}}"
-            />
-          </div>
-          <div class="col-1 removeButton">
-            <button
-              class="btn btn-danger"
-              title="Remover contato"
-              (click)="removeContato(item)"
-            >
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
 
 
