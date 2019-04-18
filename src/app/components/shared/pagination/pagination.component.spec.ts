@@ -42,4 +42,12 @@ describe('PaginationComponent', () => {
     component.changeMaxItemsPerPage(10);
     expect(component.page.size).toBe(10);
   });
+
+  it ('should update list of people when totalPages are less than the current selected page', () => {
+    spyOn(component, 'updateListViewAtPage').and.callThrough();
+    const page = component.page;
+    page.totalPages = 10;
+    component.gotoPage(15);
+    expect(component.updateListViewAtPage).toHaveBeenCalled();
+  });
 });
