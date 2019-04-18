@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { PersonContatoEntity, Page } from '../Entities';
 import { HttpResponse } from '@angular/common/http';
-import { isUndefined, isNull, isNullOrUndefined } from 'util';
+import { isUndefined, isNull } from 'util';
 
 export class MockPeopleApiService {
 
@@ -91,9 +91,7 @@ export class MockPeopleApiService {
       }));
     }
   }
-  public savePersonAndContato(
-    entity: PersonContatoEntity
-  ): Observable<HttpResponse<any>> {
+  public savePersonAndContato(entity: PersonContatoEntity): Observable<HttpResponse<any>> {
     if (
       entity.person.id === 0 ||
       isUndefined(entity.person.id) ||
@@ -101,13 +99,21 @@ export class MockPeopleApiService {
     ) {
       return of(new HttpResponse(
         {
-          status: 201
+          status: 201,
+          body: {
+            person: entity.person,
+            contatos: entity.contatos
+          }
         }
       ));
     } else {
       return of(new HttpResponse(
         {
-          status: 200
+          status: 200,
+          body: {
+            person: entity.person,
+            contatos: entity.contatos
+          }
         }
       ));
     }

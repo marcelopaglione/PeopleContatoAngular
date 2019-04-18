@@ -3,49 +3,50 @@
 <div class="row">
   <div class="container col-md-12">
     <form [formGroup]="fg" (ngSubmit)="save()">
-      <div class="form-group">
-        <label for="name">Nome</label>
-        <input
-          [ngClass]="{
-            'validating': fg.get('name').status === 'PENDING',
-            'is-invalid': fg.get('name').status === 'INVALID' && fg.get('name').touched
-          }"
-          type="text"
-          class="form-control"
-          id="name"
-          formControlName="name"
-          placeholder="Insira o nome completo"
-          name="nome"
-        />
-      </div>
-
-      <div class="form-group">
-        <div class="form-row">
-          <div class="col">
-              <label for="rg">RG</label>
-              <input [ngClass]="{'is-invalid': !fg.get('rg').valid && fg.get('rg').touched}"
-                type="text"
-                class="form-control"
-                id="rg"
-                formControlName="rg"
-                placeholder="Ex: 498362371"
-              />
-          </div>
-          <div class="col">
-              <label for="birthDate">Data de Nascimento</label>
-              <div class="input-group">
-                <input class="form-control" placeholder="Selecione a data de nascimento"
-                    [ngClass]="{'is-invalid': !fg.get('birthDate').valid && fg.get('birthDate').touched}"
-                    name="dp" formControlName="birthDate" ngbDatepicker #d="ngbDatepicker">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
-                </div>
-              </div>
-          </div>
+      <div formGroupName="person">
+        <div class="form-group">
+          <label for="name">Nome</label>
+          <input
+            [ngClass]="{
+              'validating': fg.get('person').get('name').status === 'PENDING',
+              'is-invalid': fg.get('person').get('name').status === 'INVALID' && fg.get('person').get('name').touched
+            }"
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            placeholder="Insira o nome completo"
+            name="nome"
+          />
         </div>
 
-      </div>
+        <div class="form-group">
+          <div class="form-row">
+            <div class="col">
+                <label for="rg">RG</label>
+                <input [ngClass]="{'is-invalid': !fg.get('person').get('rg').valid && fg.get('person').get('rg').touched}"
+                  type="text"
+                  class="form-control"
+                  id="rg"
+                  formControlName="rg"
+                  placeholder="Ex: 498362371"
+                />
+            </div>
+            <div class="col">
+                <label for="birthDate">Data de Nascimento</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="Selecione a data de nascimento"
+                      [ngClass]="{'is-invalid': !fg.get('person').get('birthDate').valid && fg.get('person').get('birthDate').touched}"
+                      name="dp" formControlName="birthDate" ngbDatepicker #d="ngbDatepicker">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
+                  </div>
+                </div>
+            </div>
+          </div>
 
+        </div>
+      </div>
       <div class="">
         <div class="d-flex">
           <div class="">
@@ -65,7 +66,7 @@
         </div>
         <hr />
 
-        <div *ngIf="!items">
+        <div *ngIf="!contatos.length">
           <p>
             <i class="fas fa-exclamation-circle mr-3"></i>Adicione seu primeiro
             contato

@@ -33,16 +33,20 @@ export class ManagerPersonComponent implements OnInit {
     this.idFromUrlParam ? this.title = 'Editar Pessoa' : this.title = 'Cadastrar Nova Pessoa';
 
     this.fg = this.formBuilder.group({
-        id: [null],
-        name: [null, [Validators.required, Validators.minLength(3)]],
-        rg: [null, [Validators.required, Validators.minLength(8)]],
-        birthDate: [null, [Validators.required]],
+        person: this.formBuilder.group({
+          id: [null],
+          name: [null, [Validators.required, Validators.minLength(3)]],
+          rg: [null, [Validators.required, Validators.minLength(8)]],
+          birthDate: [null, [Validators.required]],
+        }),
         contatos: this.formBuilder.array([])
       });
+
     this.initializePageContent();
   }
 
   get contatos(): FormArray { return this.fg.get('contatos') as FormArray; }
+  get person(): FormGroup { return this.fg.get('person') as FormGroup; }
 
   appAddContatoComponent(inputContato?: Contato) {
     const form = this.formBuilder.group({
@@ -50,7 +54,8 @@ export class ManagerPersonComponent implements OnInit {
       id: [null],
       person: [null]
     });
-    if (inputContato) { form.patchValue({id: inputContato.id, name: inputContato.name}); }
+    console.log('patch contato', inputContato);
+    if (inputContato) { form.patchValue(inputContato); }
 
     this.contatos.push(form);
   }
@@ -85,7 +90,7 @@ export class ManagerPersonComponent implements OnInit {
       this.api
         .getPersonById(this.idFromUrlParam)
         .subscribe(person => {
-          this.fg.patchValue(person.body);
+          this.person.patchValue(person.body);
         });
     }
   }
@@ -102,40 +107,26 @@ export class ManagerPersonComponent implements OnInit {
     }
   }
 
-  private createEntityToPersist() {
+  private updatePersonFromContatos() {
     for (const control of this.contatos.controls) {
-      control.patchValue({person: this.fg.value});
+      control.patchValue({person: this.person.value});
     }
-    const entity: PersonContatoEntity = {
-      contatos: this.contatos.value,
-      person: {
-        id: this.fg.value.id,
-        name: this.fg.value.name,
-        birthDate: this.fg.value.birthDate,
-        rg: this.fg.value.rg
-      }
-    };
-    return entity;
   }
 
   save() {
     if (!this.fg.valid) { return; }
-    const entityToPersist = this.createEntityToPersist();
-    return this.api.savePersonAndContato(entityToPersist).pipe(
+    this.updatePersonFromContatos();
+    return this.api.savePersonAndContato(this.fg.value).pipe(
       map(data => {
         if (data.status === 200 || data.status === 201) {
-          this.setResponse({ status: 'success', message: `${this.fg.value.name} foi salvo com sucesso!` });
-          this.clearFormArray();
-          this.fg.reset();
+          this.setResponse({ status: 'success', message: `${this.person.value.name} foi salvo com sucesso!` });
         }
-      }))
-      .subscribe();
-  }
-
-  clearFormArray() {
-    while (this.contatos.length !== 0) {
-      this.contatos.removeAt(0);
-    }
+        return data.body;
+      }),
+      tap(console.log))
+      .subscribe(data => {
+        this.fg.patchValue(data);
+      });
   }
 
   removeContato(contatoFormArrayIndex: number) {

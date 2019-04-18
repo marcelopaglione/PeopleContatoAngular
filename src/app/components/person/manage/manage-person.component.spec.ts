@@ -45,8 +45,8 @@ describe('ManagerPersonComponent', () => {
     fixture = TestBed.createComponent(ManagerPersonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    mockPerson = {id: null, name: 'Person name', rg: '10101010', birthDate: new Date(2000, 12, 31)};
-    mockContato = {id: 0, name: 'Seu Aparecido', person: mockPerson};
+    mockPerson = {id: null, name: 'Person name', rg: '10101010', birthDate: new Date(2019, 12, 31)};
+    mockContato = {id: null, name: 'Seu Aparecido', person: mockPerson};
     spyOn(component, 'ngOnInit').and.callThrough();
     component.ngOnInit();
 
@@ -136,8 +136,8 @@ describe('ManagerPersonComponent', () => {
     mockPerson.id = 1;
     component.ngOnInit();
     fixture.detectChanges();
-    expect(component.fg.value.id).toEqual(mockPerson.id);
-    expect(component.fg.value.name).toEqual(mockPerson.name);
+    expect(component.fg.get('person').value.id).toEqual(mockPerson.id);
+    expect(component.fg.get('person').value.name).toEqual(mockPerson.name);
   });
 
   it('should be able to navigate to `/home`', () => {
@@ -214,8 +214,7 @@ describe('ManagerPersonComponent', () => {
 
 });
 function patchPersonFormGroup(component: ManagerPersonComponent, mockPerson: Person) {
-  component.fg.patchValue(mockPerson);
-  const datepickerFromatter = new NgbStringAdapter();
-  component.fg.patchValue({birthDate: datepickerFromatter.fromModel(component.fg.value.birthDate)});
+  component.fg.patchValue({person: mockPerson});
+  component.fg.patchValue({person: {birthDate: new NgbStringAdapter().fromModel(component.fg.get('person').get('birthDate').value)}});
 }
 
